@@ -1,0 +1,16 @@
+node_modules/
+dist/
+.vite/
+
+*.log
+npm-debug.log*
+
+server/db.sqlite
+server/db.sqlite-journal
+
+.env
+.DS_Store
+Thumbs.db
+
+WA1_exam1_LastRace.pdf
+LAST_RACE_GUIDE.md
