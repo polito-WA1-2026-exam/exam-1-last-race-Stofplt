@@ -1,1 +1,19 @@
 GET http://localhost:3001/api/health
+
+###
+
+POST http://localhost:3001/api/sessions
+Content-Type: application/json
+
+{
+  "username": "alice@example.com",
+  "password": "race-pass-1"
+}
+
+###
+
+GET http://localhost:3001/api/sessions/current
+
+###
+
+DELETE http://localhost:3001/api/sessions/current
