@@ -13,6 +13,7 @@ Start the server:
 
 ```bash
 cd server
+npm run init-db
 nodemon index.js
 ```
 
