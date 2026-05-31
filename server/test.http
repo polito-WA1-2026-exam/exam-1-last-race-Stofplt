@@ -28,8 +28,20 @@ Cookie: {{login.response.headers.Set-Cookie}}
 ###
 
 ### Start game
+# @name startGame
 POST http://localhost:3001/api/games
 Cookie: {{login.response.headers.Set-Cookie}}
+
+###
+
+### Submit empty route, expected invalid score 0
+POST http://localhost:3001/api/games/{{startGame.response.body.gameId}}/route
+Cookie: {{login.response.headers.Set-Cookie}}
+Content-Type: application/json
+
+{
+  "segments": []
+}
 
 ###
 

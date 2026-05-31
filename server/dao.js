@@ -117,11 +117,102 @@ async function createGame(userId, startStationId, destinationStationId) {
   return result.lastID;
 }
 
+async function getGameForUser(gameId, userId) {
+  return await get(
+    `SELECT id,
+            user_id,
+            start_station_id,
+            destination_station_id,
+            status,
+            final_score,
+            created_at,
+            completed_at
+     FROM games
+     WHERE id = ? AND user_id = ?`,
+    [gameId, userId]
+  );
+}
+
+async function getSegmentsByIds(segmentIds) {
+  if (segmentIds.length === 0) {
+    return [];
+  }
+
+  const placeholders = segmentIds.map(() => "?").join(",");
+  const rows = await all(
+    `SELECT id, from_station_id, to_station_id, line_id
+     FROM segments
+     WHERE id IN (${placeholders})`,
+    segmentIds
+  );
+
+  const segments = rows.map(
+    (row) =>
+      new Segment(row.id, row.from_station_id, row.to_station_id, row.line_id)
+  );
+  const segmentById = new Map(segments.map((segment) => [segment.id, segment]));
+
+  return segmentIds.map((id) => segmentById.get(id) ?? null);
+}
+
+async function getInterchangeStationIds() {
+  const rows = await all(
+    `SELECT station_id
+     FROM (
+       SELECT from_station_id AS station_id, line_id FROM segments
+       UNION
+       SELECT to_station_id AS station_id, line_id FROM segments
+     )
+     GROUP BY station_id
+     HAVING COUNT(DISTINCT line_id) > 1`
+  );
+
+  return new Set(rows.map((row) => row.station_id));
+}
+
+async function savePlannedRoute(gameId, segmentIds) {
+  await run("BEGIN TRANSACTION");
+
+  try {
+    await run("DELETE FROM game_steps WHERE game_id = ?", [gameId]);
+
+    for (let i = 0; i < segmentIds.length; i++) {
+      await run(
+        `INSERT INTO game_steps (game_id, step_index, segment_id, event_id)
+         VALUES (?, ?, ?, NULL)`,
+        [gameId, i + 1, segmentIds[i]]
+      );
+    }
+
+    await run("UPDATE games SET status = 'executing' WHERE id = ?", [gameId]);
+    await run("COMMIT");
+  } catch (err) {
+    await run("ROLLBACK");
+    throw err;
+  }
+}
+
+async function failGame(gameId) {
+  await run(
+    `UPDATE games
+     SET status = 'failed',
+         final_score = 0,
+         completed_at = ?
+     WHERE id = ?`,
+    [new Date().toISOString(), gameId]
+  );
+}
+
 export {
   getUser,
   getUserById,
   getStations,
   getLines,
   getSegments,
-  createGame
+  createGame,
+  getGameForUser,
+  getSegmentsByIds,
+  getInterchangeStationIds,
+  savePlannedRoute,
+  failGame
 };

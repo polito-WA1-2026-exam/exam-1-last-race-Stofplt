@@ -5,13 +5,20 @@ import passport from "passport";
 import { configurePassport, isLoggedIn } from "./auth.js";
 import {
   createGame,
+  failGame,
+  getGameForUser,
+  getInterchangeStationIds,
   getLines,
   getSegments,
-  getStations
+  getSegmentsByIds,
+  getStations,
+  savePlannedRoute
 } from "./dao.js";
 import {
   buildGameStartPayload,
-  pickStartAndDestination
+  hasPlanningTimeExpired,
+  pickStartAndDestination,
+  validateRoute
 } from "./gameLogic.js";
 
 const app = express();
@@ -104,7 +111,80 @@ app.post("/api/games", isLoggedIn, async (req, res, next) => {
       pair.destinationStation.id
     );
 
+    req.session.gameStartTimes ??= {};
+    req.session.gameStartTimes[gameId] = Date.now();
+
     res.status(201).json(buildGameStartPayload(gameId, pair));
+  } catch (err) {
+    next(err);
+  }
+});
+
+app.post("/api/games/:id/route", isLoggedIn, async (req, res, next) => {
+  try {
+    const gameId = Number(req.params.id);
+
+    if (!Number.isInteger(gameId) || gameId <= 0) {
+      return res.status(422).json({ error: "Invalid game id" });
+    }
+    if (!Array.isArray(req.body.segments)) {
+      return res.status(422).json({ error: "segments must be an array" });
+    }
+    if (
+      req.body.segments.some(
+        (segmentId) => !Number.isInteger(segmentId) || segmentId <= 0
+      )
+    ) {
+      return res
+        .status(422)
+        .json({ error: "segments must contain positive integers" });
+    }
+
+    const game = await getGameForUser(gameId, req.user.id);
+
+    if (!game) {
+      return res.status(404).json({ error: "Game not found" });
+    }
+    if (game.status !== "planning") {
+      return res
+        .status(409)
+        .json({ error: "The game is not accepting a route" });
+    }
+
+    const startedAt = req.session.gameStartTimes?.[gameId];
+
+    if (hasPlanningTimeExpired(startedAt)) {
+      await failGame(gameId);
+      delete req.session.gameStartTimes?.[gameId];
+      return res.json({
+        valid: false,
+        score: 0,
+        reason: "Planning time expired"
+      });
+    }
+
+    const selectedSegments = await getSegmentsByIds(req.body.segments);
+    const interchangeStationIds = await getInterchangeStationIds();
+    const validation = validateRoute(game, selectedSegments, interchangeStationIds);
+
+    if (!validation.valid) {
+      await failGame(gameId);
+      delete req.session.gameStartTimes?.[gameId];
+      return res.json({
+        valid: false,
+        score: 0,
+        reason: validation.reason
+      });
+    }
+
+    await savePlannedRoute(gameId, req.body.segments);
+    delete req.session.gameStartTimes?.[gameId];
+
+    res.json({
+      valid: true,
+      gameId,
+      status: "executing"
+    });
   } catch (err) {
     next(err);
   }

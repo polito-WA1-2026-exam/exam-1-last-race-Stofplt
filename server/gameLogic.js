@@ -1,3 +1,5 @@
+const PLANNING_TIME_LIMIT_MS = 95_000;
+
 function buildAdjacency(segments) {
   const adjacency = new Map();
 
@@ -71,4 +73,64 @@ function buildGameStartPayload(gameId, pair) {
   };
 }
 
-export { pickStartAndDestination, buildGameStartPayload };
+function validateRoute(game, selectedSegments, interchangeStationIds) {
+  if (selectedSegments.length === 0) {
+    return { valid: false, reason: "The route is empty" };
+  }
+
+  if (selectedSegments.some((segment) => !segment)) {
+    return { valid: false, reason: "The route contains an unknown segment" };
+  }
+
+  if (selectedSegments[0].fromStationId !== game.start_station_id) {
+    return {
+      valid: false,
+      reason: "The route does not start from the assigned station"
+    };
+  }
+
+  for (let i = 0; i < selectedSegments.length - 1; i++) {
+    const current = selectedSegments[i];
+    const next = selectedSegments[i + 1];
+
+    if (current.toStationId !== next.fromStationId) {
+      return {
+        valid: false,
+        reason: "The route contains non-consecutive segments"
+      };
+    }
+
+    // With the current segment model this is mostly guaranteed by consecutive
+    // segments, but keeping the check makes the interchange rule explicit.
+    if (
+      current.lineId !== next.lineId &&
+      !interchangeStationIds.has(current.toStationId)
+    ) {
+      return { valid: false, reason: "Line change outside interchange station" };
+    }
+  }
+
+  if (
+    selectedSegments[selectedSegments.length - 1].toStationId !==
+    game.destination_station_id
+  ) {
+    return {
+      valid: false,
+      reason: "The route does not reach the assigned destination"
+    };
+  }
+
+  return { valid: true };
+}
+
+function hasPlanningTimeExpired(startedAt, now = Date.now()) {
+  return !startedAt || now - startedAt > PLANNING_TIME_LIMIT_MS;
+}
+
+export {
+  PLANNING_TIME_LIMIT_MS,
+  pickStartAndDestination,
+  buildGameStartPayload,
+  validateRoute,
+  hasPlanningTimeExpired
+};
