@@ -3,6 +3,7 @@ import cors from "cors";
 import session from "express-session";
 import passport from "passport";
 import { configurePassport, isLoggedIn } from "./auth.js";
+import { getLines, getSegments, getStations } from "./dao.js";
 
 const app = express();
 const port = process.env.PORT || 3001;
@@ -58,6 +59,20 @@ app.delete("/api/sessions/current", isLoggedIn, (req, res, next) => {
     }
     res.end();
   });
+});
+
+app.get("/api/network/full", isLoggedIn, async (req, res, next) => {
+  try {
+    const [stations, lines, segments] = await Promise.all([
+      getStations(),
+      getLines(),
+      getSegments()
+    ]);
+
+    res.json({ stations, lines, segments });
+  } catch (err) {
+    next(err);
+  }
 });
 
 app.listen(port, () => {

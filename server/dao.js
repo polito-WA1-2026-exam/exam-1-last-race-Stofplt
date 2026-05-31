@@ -1,6 +1,7 @@
 import crypto from "crypto";
 import sqlite3 from "sqlite3";
 import { promisify } from "util";
+import { Line, Segment, Station } from "./models.js";
 
 const db = new sqlite3.Database("db.sqlite");
 const scrypt = promisify(crypto.scrypt);
@@ -10,6 +11,15 @@ function get(sql, params = []) {
     db.get(sql, params, (err, row) => {
       if (err) reject(err);
       else resolve(row);
+    });
+  });
+}
+
+function all(sql, params = []) {
+  return new Promise((resolve, reject) => {
+    db.all(sql, params, (err, rows) => {
+      if (err) reject(err);
+      else resolve(rows);
     });
   });
 }
@@ -47,4 +57,37 @@ async function getUserById(id) {
   return user ? toPublicUser(user) : false;
 }
 
-export { getUser, getUserById };
+async function getStations() {
+  const rows = await all(
+    `SELECT id, name, x, y
+     FROM stations
+     ORDER BY name`
+  );
+
+  return rows.map((row) => new Station(row.id, row.name, row.x, row.y));
+}
+
+async function getLines() {
+  const rows = await all(
+    `SELECT id, name, color
+     FROM lines
+     ORDER BY id`
+  );
+
+  return rows.map((row) => new Line(row.id, row.name, row.color));
+}
+
+async function getSegments() {
+  const rows = await all(
+    `SELECT id, from_station_id, to_station_id, line_id
+     FROM segments
+     ORDER BY line_id, id`
+  );
+
+  return rows.map(
+    (row) =>
+      new Segment(row.id, row.from_station_id, row.to_station_id, row.line_id)
+  );
+}
+
+export { getUser, getUserById, getStations, getLines, getSegments };

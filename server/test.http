@@ -1,7 +1,10 @@
+### Health
 GET http://localhost:3001/api/health
 
 ###
 
+### Login
+# @name login
 POST http://localhost:3001/api/sessions
 Content-Type: application/json
 
@@ -12,8 +15,18 @@ Content-Type: application/json
 
 ###
 
+### Current user
 GET http://localhost:3001/api/sessions/current
+Cookie: {{login.response.headers.Set-Cookie}}
 
 ###
 
+### Full network
+GET http://localhost:3001/api/network/full
+Cookie: {{login.response.headers.Set-Cookie}}
+
+###
+
+### Logout
 DELETE http://localhost:3001/api/sessions/current
+Cookie: {{login.response.headers.Set-Cookie}}
