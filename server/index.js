@@ -4,17 +4,24 @@ import session from "express-session";
 import passport from "passport";
 import { configurePassport, isLoggedIn } from "./auth.js";
 import {
+  applyEventToStep,
+  completeGame,
   createGame,
   failGame,
+  getCurrentCoins,
   getGameForUser,
   getInterchangeStationIds,
   getLines,
+  getNextStep,
+  getRandomEvent,
   getSegments,
   getSegmentsByIds,
   getStations,
+  hasPendingSteps,
   savePlannedRoute
 } from "./dao.js";
 import {
+  applyEventEffect,
   buildGameStartPayload,
   hasPlanningTimeExpired,
   pickStartAndDestination,
@@ -184,6 +191,66 @@ app.post("/api/games/:id/route", isLoggedIn, async (req, res, next) => {
       valid: true,
       gameId,
       status: "executing"
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+app.post("/api/games/:id/execute/next", isLoggedIn, async (req, res, next) => {
+  try {
+    const gameId = Number(req.params.id);
+
+    if (!Number.isInteger(gameId) || gameId <= 0) {
+      return res.status(422).json({ error: "Invalid game id" });
+    }
+
+    const game = await getGameForUser(gameId, req.user.id);
+
+    if (!game) {
+      return res.status(404).json({ error: "Game not found" });
+    }
+    if (game.status !== "executing") {
+      return res
+        .status(409)
+        .json({ error: "The game is not ready for execution" });
+    }
+
+    const step = await getNextStep(gameId);
+
+    if (!step) {
+      return res.status(409).json({ error: "No pending steps to execute" });
+    }
+
+    const [currentCoins, event] = await Promise.all([
+      getCurrentCoins(gameId),
+      getRandomEvent()
+    ]);
+    const updatedCoins = applyEventEffect(currentCoins, event);
+
+    await applyEventToStep(gameId, step.step_index, event.id);
+
+    const completed = !(await hasPendingSteps(gameId));
+
+    if (completed) {
+      await completeGame(gameId, updatedCoins);
+    }
+
+    res.json({
+      completed,
+      score: completed ? Math.max(0, updatedCoins) : undefined,
+      step: {
+        index: step.step_index,
+        segmentId: step.segment_id,
+        fromStation: step.from_station_name,
+        toStation: step.to_station_name,
+        line: step.line_name,
+        event: {
+          description: event.description,
+          effect: event.effect
+        },
+        coins: updatedCoins
+      }
     });
   } catch (err) {
     next(err);

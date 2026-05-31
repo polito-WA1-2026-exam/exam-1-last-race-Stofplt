@@ -45,6 +45,12 @@ Content-Type: application/json
 
 ###
 
+### Execute next step
+POST http://localhost:3001/api/games/{{startGame.response.body.gameId}}/execute/next
+Cookie: {{login.response.headers.Set-Cookie}}
+
+###
+
 ### Login without loading network first
 # @name loginWithoutNetwork
 POST http://localhost:3001/api/sessions

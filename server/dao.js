@@ -203,6 +203,81 @@ async function failGame(gameId) {
   );
 }
 
+async function getNextStep(gameId) {
+  return await get(
+    `SELECT gs.game_id,
+            gs.step_index,
+            gs.segment_id,
+            s.from_station_id,
+            fs.name AS from_station_name,
+            s.to_station_id,
+            ts.name AS to_station_name,
+            s.line_id,
+            l.name AS line_name
+     FROM game_steps gs
+     JOIN segments s ON s.id = gs.segment_id
+     JOIN stations fs ON fs.id = s.from_station_id
+     JOIN stations ts ON ts.id = s.to_station_id
+     JOIN lines l ON l.id = s.line_id
+     WHERE gs.game_id = ? AND gs.event_id IS NULL
+     ORDER BY gs.step_index
+     LIMIT 1`,
+    [gameId]
+  );
+}
+
+async function getRandomEvent() {
+  return await get(
+    `SELECT id, description, effect
+     FROM events
+     ORDER BY RANDOM()
+     LIMIT 1`
+  );
+}
+
+async function getCurrentCoins(gameId) {
+  const row = await get(
+    `SELECT COALESCE(20 + SUM(e.effect), 20) AS coins
+     FROM game_steps gs
+     LEFT JOIN events e ON e.id = gs.event_id
+     WHERE gs.game_id = ?`,
+    [gameId]
+  );
+
+  return row.coins;
+}
+
+async function applyEventToStep(gameId, stepIndex, eventId) {
+  await run(
+    `UPDATE game_steps
+     SET event_id = ?
+     WHERE game_id = ? AND step_index = ?`,
+    [eventId, gameId, stepIndex]
+  );
+}
+
+async function hasPendingSteps(gameId) {
+  const row = await get(
+    `SELECT COUNT(*) AS count
+     FROM game_steps
+     WHERE game_id = ? AND event_id IS NULL`,
+    [gameId]
+  );
+
+  return row.count > 0;
+}
+
+async function completeGame(gameId, finalScore) {
+  await run(
+    `UPDATE games
+     SET status = 'completed',
+         final_score = ?,
+         completed_at = ?
+     WHERE id = ?`,
+    [Math.max(0, finalScore), new Date().toISOString(), gameId]
+  );
+}
+
 export {
   getUser,
   getUserById,
@@ -214,5 +289,11 @@ export {
   getSegmentsByIds,
   getInterchangeStationIds,
   savePlannedRoute,
-  failGame
+  failGame,
+  getNextStep,
+  getRandomEvent,
+  getCurrentCoins,
+  applyEventToStep,
+  hasPendingSteps,
+  completeGame
 };
