@@ -24,6 +24,15 @@ function all(sql, params = []) {
   });
 }
 
+function run(sql, params = []) {
+  return new Promise((resolve, reject) => {
+    db.run(sql, params, function (err) {
+      if (err) reject(err);
+      else resolve(this);
+    });
+  });
+}
+
 function toPublicUser(row) {
   return {
     id: row.id,
@@ -90,4 +99,29 @@ async function getSegments() {
   );
 }
 
-export { getUser, getUserById, getStations, getLines, getSegments };
+async function createGame(userId, startStationId, destinationStationId) {
+  const result = await run(
+    `INSERT INTO games (
+       user_id,
+       start_station_id,
+       destination_station_id,
+       status,
+       final_score,
+       created_at,
+       completed_at
+     )
+     VALUES (?, ?, ?, 'planning', NULL, ?, NULL)`,
+    [userId, startStationId, destinationStationId, new Date().toISOString()]
+  );
+
+  return result.lastID;
+}
+
+export {
+  getUser,
+  getUserById,
+  getStations,
+  getLines,
+  getSegments,
+  createGame
+};

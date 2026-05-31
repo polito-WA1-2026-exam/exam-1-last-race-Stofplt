@@ -27,6 +27,30 @@ Cookie: {{login.response.headers.Set-Cookie}}
 
 ###
 
+### Start game
+POST http://localhost:3001/api/games
+Cookie: {{login.response.headers.Set-Cookie}}
+
+###
+
+### Login without loading network first
+# @name loginWithoutNetwork
+POST http://localhost:3001/api/sessions
+Content-Type: application/json
+
+{
+  "username": "bruno@example.com",
+  "password": "race-pass-2"
+}
+
+###
+
+### Start game without network, expected 409
+POST http://localhost:3001/api/games
+Cookie: {{loginWithoutNetwork.response.headers.Set-Cookie}}
+
+###
+
 ### Logout
 DELETE http://localhost:3001/api/sessions/current
 Cookie: {{login.response.headers.Set-Cookie}}

@@ -3,7 +3,16 @@ import cors from "cors";
 import session from "express-session";
 import passport from "passport";
 import { configurePassport, isLoggedIn } from "./auth.js";
-import { getLines, getSegments, getStations } from "./dao.js";
+import {
+  createGame,
+  getLines,
+  getSegments,
+  getStations
+} from "./dao.js";
+import {
+  buildGameStartPayload,
+  pickStartAndDestination
+} from "./gameLogic.js";
 
 const app = express();
 const port = process.env.PORT || 3001;
@@ -69,7 +78,33 @@ app.get("/api/network/full", isLoggedIn, async (req, res, next) => {
       getSegments()
     ]);
 
+    req.session.networkLoaded = true;
     res.json({ stations, lines, segments });
+  } catch (err) {
+    next(err);
+  }
+});
+
+app.post("/api/games", isLoggedIn, async (req, res, next) => {
+  try {
+    if (!req.session.networkLoaded) {
+      return res.status(409).json({
+        error: "Load the network before starting a game"
+      });
+    }
+
+    const [stations, segments] = await Promise.all([
+      getStations(),
+      getSegments()
+    ]);
+    const pair = pickStartAndDestination(stations, segments);
+    const gameId = await createGame(
+      req.user.id,
+      pair.startStation.id,
+      pair.destinationStation.id
+    );
+
+    res.status(201).json(buildGameStartPayload(gameId, pair));
   } catch (err) {
     next(err);
   }
