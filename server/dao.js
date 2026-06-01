@@ -1,7 +1,12 @@
 import crypto from "crypto";
+import fs from "fs";
 import sqlite3 from "sqlite3";
 import { promisify } from "util";
 import { Line, Segment, Station } from "./models.js";
+
+if (!fs.existsSync("db.sqlite")) {
+  throw new Error("Database file not found. Run 'npm run init-db' in server/.");
+}
 
 const db = new sqlite3.Database("db.sqlite");
 const scrypt = promisify(crypto.scrypt);

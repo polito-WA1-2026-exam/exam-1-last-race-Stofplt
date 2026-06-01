@@ -310,9 +310,13 @@ app.get("/api/ranking", isLoggedIn, async (req, res, next) => {
   }
 });
 
+app.use((req, res, next) => {
+  res.status(404).json({ error: "API route not found" });
+});
+
 app.use((err, req, res, next) => {
   console.error(err);
-  res.status(500).json({ error: "Internal server error" });
+  return res.status(500).json({ error: "Internal server error" });
 });
 
 app.listen(port, () => {

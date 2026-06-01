@@ -6,6 +6,9 @@ GET {{baseUrl}}/health
 ### Public - instructions
 GET {{baseUrl}}/instructions
 
+### Public - missing API route, expected 404
+GET {{baseUrl}}/missing
+
 
 ### Auth - login Alice
 # @name loginAlice
