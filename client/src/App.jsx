@@ -5,6 +5,7 @@ import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import { UserProvider } from "./contexts/UserContext.js";
 import InstructionsPage from "./pages/InstructionsPage.jsx";
 import LoginPage from "./pages/LoginPage.jsx";
+import PlanningPage from "./pages/PlanningPage.jsx";
 import RankingPage from "./pages/RankingPage.jsx";
 import SetupPage from "./pages/SetupPage.jsx";
 
@@ -23,6 +24,14 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <SetupPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/planning/:gameId"
+                element={
+                  <ProtectedRoute>
+                    <PlanningPage />
                   </ProtectedRoute>
                 }
               />

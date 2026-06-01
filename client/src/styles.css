@@ -11,6 +11,102 @@ main {
   max-width: 760px;
 }
 
+.setup-page {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.page-title-row {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.network-summary {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.line-list,
+.station-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.line-chip,
+.station-grid span {
+  align-items: center;
+  background: #ffffff;
+  border: 1px solid #d8d8d2;
+  border-radius: 6px;
+  display: inline-flex;
+  min-height: 2rem;
+  padding: 0.25rem 0.6rem;
+}
+
+.line-swatch {
+  border-radius: 999px;
+  display: inline-block;
+  height: 0.75rem;
+  margin-right: 0.45rem;
+  width: 0.75rem;
+}
+
+.segment-list {
+  background: #ffffff;
+  border: 1px solid #d8d8d2;
+  border-radius: 8px;
+  display: grid;
+}
+
+.segment-row {
+  align-items: center;
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: 4rem minmax(0, 1fr) auto minmax(0, 1fr) minmax(6rem, auto);
+  min-height: 2.5rem;
+  padding: 0.5rem 0.75rem;
+}
+
+.segment-row + .segment-row {
+  border-top: 1px solid #eeeeea;
+}
+
+.segment-id,
+.segment-line {
+  color: #66665f;
+  font-size: 0.9rem;
+}
+
+.planning-summary {
+  background: #ffffff;
+  border: 1px solid #d8d8d2;
+  border-radius: 8px;
+  display: grid;
+  gap: 0;
+}
+
+.planning-summary div {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: 8rem 1fr;
+  padding: 0.75rem 1rem;
+}
+
+.planning-summary div + div {
+  border-top: 1px solid #eeeeea;
+}
+
+.planning-summary dt {
+  color: #66665f;
+}
+
+.planning-summary dd {
+  margin: 0;
+}
+
 .auth-panel {
   max-width: 420px;
 }
