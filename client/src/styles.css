@@ -11,7 +11,9 @@ main {
   max-width: 760px;
 }
 
+.execution-page,
 .planning-page,
+.result-page,
 .setup-page {
   display: grid;
   gap: 1.5rem;
@@ -128,6 +130,45 @@ main {
   gap: 0.5rem;
   justify-content: flex-end;
   margin-top: 0.75rem;
+}
+
+.execution-list {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.execution-step {
+  background: #ffffff;
+  border: 1px solid #d8d8d2;
+  border-radius: 8px;
+  display: grid;
+  gap: 0.6rem;
+  padding: 0.9rem;
+}
+
+.execution-step-header,
+.execution-event,
+.execution-route {
+  align-items: center;
+  display: flex;
+  gap: 0.7rem;
+}
+
+.execution-step-header {
+  color: #66665f;
+  justify-content: space-between;
+}
+
+.execution-route {
+  font-weight: 600;
+}
+
+.execution-event {
+  justify-content: space-between;
+}
+
+.execution-coins {
+  color: #33332f;
 }
 
 .planning-summary {

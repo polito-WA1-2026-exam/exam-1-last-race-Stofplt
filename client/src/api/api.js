@@ -42,9 +42,21 @@ async function submitRoute(gameId, segments) {
   });
 }
 
+async function executeNextStep(gameId) {
+  return await requestJson(`/games/${gameId}/execute/next`, {
+    method: "POST"
+  });
+}
+
+async function getGameResult(gameId) {
+  return await requestJson(`/games/${gameId}/result`);
+}
+
 export {
   SERVER_URL,
   createGame,
+  executeNextStep,
+  getGameResult,
   getHealth,
   getInstructions,
   getNetwork,

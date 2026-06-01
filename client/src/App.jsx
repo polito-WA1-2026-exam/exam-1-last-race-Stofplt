@@ -8,6 +8,7 @@ import InstructionsPage from "./pages/InstructionsPage.jsx";
 import LoginPage from "./pages/LoginPage.jsx";
 import PlanningPage from "./pages/PlanningPage.jsx";
 import RankingPage from "./pages/RankingPage.jsx";
+import ResultPage from "./pages/ResultPage.jsx";
 import SetupPage from "./pages/SetupPage.jsx";
 
 function App() {
@@ -41,6 +42,14 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <ExecutionPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/result/:gameId"
+                element={
+                  <ProtectedRoute>
+                    <ResultPage />
                   </ProtectedRoute>
                 }
               />

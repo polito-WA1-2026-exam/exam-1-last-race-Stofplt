@@ -1,7 +1,68 @@
+import { useState } from "react";
+import { Alert, Button } from "react-bootstrap";
+import { useNavigate, useParams } from "react-router";
+import { executeNextStep } from "../api/api.js";
+import ExecutionStep from "../components/ExecutionStep.jsx";
+
 function ExecutionPage() {
+  const { gameId } = useParams();
+  const navigate = useNavigate();
+  const [steps, setSteps] = useState([]);
+  const [error, setError] = useState("");
+  const [executing, setExecuting] = useState(false);
+  const [completed, setCompleted] = useState(false);
+  const [score, setScore] = useState(null);
+
+  async function handleExecuteNext() {
+    setError("");
+    setExecuting(true);
+
+    try {
+      const result = await executeNextStep(gameId);
+      setSteps((current) => [...current, result.step]);
+
+      if (result.completed) {
+        setCompleted(true);
+        setScore(result.score);
+      }
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setExecuting(false);
+    }
+  }
+
   return (
-    <section className="page-section">
-      <h1>Execution</h1>
+    <section className="execution-page">
+      <div className="page-title-row">
+        <h1>Execution</h1>
+        {completed ? (
+          <Button onClick={() => navigate(`/result/${gameId}`)}>View result</Button>
+        ) : (
+          <Button disabled={executing} onClick={handleExecuteNext}>
+            {executing ? "Executing..." : "Execute next"}
+          </Button>
+        )}
+      </div>
+
+      {error && <Alert variant="danger">{error}</Alert>}
+      {completed && (
+        <Alert variant="success">
+          Race completed. Final score: {score}
+        </Alert>
+      )}
+
+      {steps.length === 0 ? (
+        <div className="empty-route">
+          <p className="mb-0">Execute the first segment to reveal its event.</p>
+        </div>
+      ) : (
+        <div className="execution-list">
+          {steps.map((step) => (
+            <ExecutionStep key={step.index} step={step} />
+          ))}
+        </div>
+      )}
     </section>
   );
 }
