@@ -6,3 +6,17 @@ body {
 main {
   min-height: calc(100vh - 56px);
 }
+
+.page-section {
+  max-width: 760px;
+}
+
+.auth-panel {
+  max-width: 420px;
+}
+
+.page-loader {
+  align-items: center;
+  display: flex;
+  min-height: 220px;
+}

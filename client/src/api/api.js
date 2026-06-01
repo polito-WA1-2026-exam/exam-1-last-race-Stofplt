@@ -17,4 +17,8 @@ async function getHealth() {
   return await getJson("/health");
 }
 
-export { SERVER_URL, getHealth };
+async function getInstructions() {
+  return await getJson("/instructions");
+}
+
+export { SERVER_URL, getHealth, getInstructions };

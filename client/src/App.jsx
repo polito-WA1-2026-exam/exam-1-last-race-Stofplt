@@ -1,25 +1,45 @@
-import { Container, Nav, Navbar } from "react-bootstrap";
+import { Container } from "react-bootstrap";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router";
+import AppNavbar from "./components/AppNavbar.jsx";
+import ProtectedRoute from "./components/ProtectedRoute.jsx";
+import { UserProvider } from "./contexts/UserContext.js";
+import InstructionsPage from "./pages/InstructionsPage.jsx";
+import LoginPage from "./pages/LoginPage.jsx";
+import RankingPage from "./pages/RankingPage.jsx";
+import SetupPage from "./pages/SetupPage.jsx";
 
 function App() {
   return (
-    <>
-      <Navbar bg="dark" data-bs-theme="dark" expand="lg">
-        <Container>
-          <Navbar.Brand>Last Race</Navbar.Brand>
-          <Nav className="ms-auto">
-            <Nav.Link disabled>Setup</Nav.Link>
-            <Nav.Link disabled>Ranking</Nav.Link>
-          </Nav>
-        </Container>
-      </Navbar>
-
-      <main>
-        <Container className="py-4">
-          <h1>Last Race</h1>
-          <p className="lead">Last Race.</p>
-        </Container>
-      </main>
-    </>
+    <BrowserRouter>
+      <UserProvider>
+        <AppNavbar />
+        <main>
+          <Container className="py-4">
+            <Routes>
+              <Route path="/" element={<InstructionsPage />} />
+              <Route path="/login" element={<LoginPage />} />
+              <Route
+                path="/setup"
+                element={
+                  <ProtectedRoute>
+                    <SetupPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/ranking"
+                element={
+                  <ProtectedRoute>
+                    <RankingPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </Container>
+        </main>
+      </UserProvider>
+    </BrowserRouter>
   );
 }
 
