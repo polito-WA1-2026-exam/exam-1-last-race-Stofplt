@@ -51,6 +51,18 @@ Cookie: {{login.response.headers.Set-Cookie}}
 
 ###
 
+### Game result
+GET http://localhost:3001/api/games/{{startGame.response.body.gameId}}/result
+Cookie: {{login.response.headers.Set-Cookie}}
+
+###
+
+### Ranking
+GET http://localhost:3001/api/ranking
+Cookie: {{login.response.headers.Set-Cookie}}
+
+###
+
 ### Login without loading network first
 # @name loginWithoutNetwork
 POST http://localhost:3001/api/sessions

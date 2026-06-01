@@ -278,6 +278,61 @@ async function completeGame(gameId, finalScore) {
   );
 }
 
+async function getGameResult(gameId, userId) {
+  return await get(
+    `SELECT g.id,
+            g.status,
+            g.final_score,
+            g.created_at,
+            g.completed_at,
+            ss.id AS start_station_id,
+            ss.name AS start_station_name,
+            ds.id AS destination_station_id,
+            ds.name AS destination_station_name
+     FROM games g
+     JOIN stations ss ON ss.id = g.start_station_id
+     JOIN stations ds ON ds.id = g.destination_station_id
+     WHERE g.id = ? AND g.user_id = ?`,
+    [gameId, userId]
+  );
+}
+
+async function getExecutedSteps(gameId) {
+  return await all(
+    `SELECT gs.step_index,
+            gs.segment_id,
+            s.from_station_id,
+            fs.name AS from_station_name,
+            s.to_station_id,
+            ts.name AS to_station_name,
+            l.name AS line_name,
+            e.description AS event_description,
+            e.effect AS event_effect
+     FROM game_steps gs
+     JOIN segments s ON s.id = gs.segment_id
+     JOIN stations fs ON fs.id = s.from_station_id
+     JOIN stations ts ON ts.id = s.to_station_id
+     JOIN lines l ON l.id = s.line_id
+     LEFT JOIN events e ON e.id = gs.event_id
+     WHERE gs.game_id = ?
+     ORDER BY gs.step_index`,
+    [gameId]
+  );
+}
+
+async function getRanking() {
+  return await all(
+    `SELECT u.id AS user_id,
+            u.name,
+            MAX(g.final_score) AS best_score
+     FROM users u
+     JOIN games g ON g.user_id = u.id
+     WHERE g.status = 'completed'
+     GROUP BY u.id, u.name
+     ORDER BY best_score DESC, u.name ASC`
+  );
+}
+
 export {
   getUser,
   getUserById,
@@ -295,5 +350,8 @@ export {
   getCurrentCoins,
   applyEventToStep,
   hasPendingSteps,
-  completeGame
+  completeGame,
+  getGameResult,
+  getExecutedSteps,
+  getRanking
 };

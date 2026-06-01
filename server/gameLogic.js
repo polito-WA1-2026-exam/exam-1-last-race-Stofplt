@@ -131,11 +131,51 @@ function applyEventEffect(currentCoins, event) {
   return currentCoins + event.effect;
 }
 
+function buildResultPayload(game, steps) {
+  let coins = 20;
+
+  return {
+    gameId: game.id,
+    status: game.status,
+    score: game.final_score,
+    startStation: {
+      id: game.start_station_id,
+      name: game.start_station_name
+    },
+    destinationStation: {
+      id: game.destination_station_id,
+      name: game.destination_station_name
+    },
+    steps: steps.map((step) => {
+      if (step.event_effect !== null) {
+        coins += step.event_effect;
+      }
+
+      return {
+        index: step.step_index,
+        segmentId: step.segment_id,
+        fromStation: step.from_station_name,
+        toStation: step.to_station_name,
+        line: step.line_name,
+        event:
+          step.event_effect === null
+            ? null
+            : {
+                description: step.event_description,
+                effect: step.event_effect
+              },
+        coins: step.event_effect === null ? null : coins
+      };
+    })
+  };
+}
+
 export {
   PLANNING_TIME_LIMIT_MS,
   pickStartAndDestination,
   buildGameStartPayload,
   validateRoute,
   hasPlanningTimeExpired,
-  applyEventEffect
+  applyEventEffect,
+  buildResultPayload
 };

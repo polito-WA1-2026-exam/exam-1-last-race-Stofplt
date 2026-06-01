@@ -9,10 +9,13 @@ import {
   createGame,
   failGame,
   getCurrentCoins,
+  getExecutedSteps,
   getGameForUser,
+  getGameResult,
   getInterchangeStationIds,
   getLines,
   getNextStep,
+  getRanking,
   getRandomEvent,
   getSegments,
   getSegmentsByIds,
@@ -23,6 +26,7 @@ import {
 import {
   applyEventEffect,
   buildGameStartPayload,
+  buildResultPayload,
   hasPlanningTimeExpired,
   pickStartAndDestination,
   validateRoute
@@ -252,6 +256,42 @@ app.post("/api/games/:id/execute/next", isLoggedIn, async (req, res, next) => {
         coins: updatedCoins
       }
     });
+  } catch (err) {
+    next(err);
+  }
+});
+
+app.get("/api/games/:id/result", isLoggedIn, async (req, res, next) => {
+  try {
+    const gameId = Number(req.params.id);
+
+    if (!Number.isInteger(gameId) || gameId <= 0) {
+      return res.status(422).json({ error: "Invalid game id" });
+    }
+
+    const game = await getGameResult(gameId, req.user.id);
+
+    if (!game) {
+      return res.status(404).json({ error: "Game not found" });
+    }
+
+    const steps = await getExecutedSteps(gameId);
+    res.json(buildResultPayload(game, steps));
+  } catch (err) {
+    next(err);
+  }
+});
+
+app.get("/api/ranking", isLoggedIn, async (req, res, next) => {
+  try {
+    const ranking = await getRanking();
+    res.json(
+      ranking.map((entry) => ({
+        userId: entry.user_id,
+        name: entry.name,
+        bestScore: entry.best_score
+      }))
+    );
   } catch (err) {
     next(err);
   }
