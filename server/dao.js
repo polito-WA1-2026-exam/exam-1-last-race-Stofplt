@@ -138,6 +138,22 @@ async function getGameForUser(gameId, userId) {
   );
 }
 
+async function getPlanningGame(gameId, userId) {
+  return await get(
+    `SELECT g.id,
+            g.status,
+            ss.id AS start_station_id,
+            ss.name AS start_station_name,
+            ds.id AS destination_station_id,
+            ds.name AS destination_station_name
+     FROM games g
+     JOIN stations ss ON ss.id = g.start_station_id
+     JOIN stations ds ON ds.id = g.destination_station_id
+     WHERE g.id = ? AND g.user_id = ?`,
+    [gameId, userId]
+  );
+}
+
 async function getSegmentsByIds(segmentIds) {
   if (segmentIds.length === 0) {
     return [];
@@ -346,6 +362,7 @@ export {
   getSegments,
   createGame,
   getGameForUser,
+  getPlanningGame,
   getSegmentsByIds,
   getInterchangeStationIds,
   savePlannedRoute,

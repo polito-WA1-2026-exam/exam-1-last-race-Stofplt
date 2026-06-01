@@ -30,4 +30,24 @@ async function createGame() {
   return await requestJson("/games", { method: "POST" });
 }
 
-export { SERVER_URL, createGame, getHealth, getInstructions, getNetwork };
+async function getPlanningGame(gameId) {
+  return await requestJson(`/games/${gameId}/planning`);
+}
+
+async function submitRoute(gameId, segments) {
+  return await requestJson(`/games/${gameId}/route`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ segments })
+  });
+}
+
+export {
+  SERVER_URL,
+  createGame,
+  getHealth,
+  getInstructions,
+  getNetwork,
+  getPlanningGame,
+  submitRoute
+};

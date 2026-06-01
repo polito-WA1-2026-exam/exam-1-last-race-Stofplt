@@ -15,6 +15,7 @@ import {
   getInterchangeStationIds,
   getLines,
   getNextStep,
+  getPlanningGame,
   getRanking,
   getRandomEvent,
   getSegments,
@@ -139,6 +140,42 @@ app.post("/api/games", isLoggedIn, async (req, res, next) => {
     req.session.gameStartTimes[gameId] = Date.now();
 
     res.status(201).json(buildGameStartPayload(gameId, pair));
+  } catch (err) {
+    next(err);
+  }
+});
+
+app.get("/api/games/:id/planning", isLoggedIn, async (req, res, next) => {
+  try {
+    const gameId = Number(req.params.id);
+
+    if (!Number.isInteger(gameId) || gameId <= 0) {
+      return res.status(422).json({ error: "Invalid game id" });
+    }
+
+    const game = await getPlanningGame(gameId, req.user.id);
+
+    if (!game) {
+      return res.status(404).json({ error: "Game not found" });
+    }
+    if (game.status !== "planning") {
+      return res
+        .status(409)
+        .json({ error: "The game is not accepting a route" });
+    }
+
+    res.json({
+      gameId: game.id,
+      status: game.status,
+      startStation: {
+        id: game.start_station_id,
+        name: game.start_station_name
+      },
+      destinationStation: {
+        id: game.destination_station_id,
+        name: game.destination_station_name
+      }
+    });
   } catch (err) {
     next(err);
   }

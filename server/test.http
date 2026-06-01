@@ -48,6 +48,10 @@ GET {{baseUrl}}/ranking
 POST {{baseUrl}}/games
 Cookie: {{loginAlice.response.headers.Set-Cookie}}
 
+### Game - planning data
+GET {{baseUrl}}/games/{{startGame.response.body.gameId}}/planning
+Cookie: {{loginAlice.response.headers.Set-Cookie}}
+
 ### Game - submit empty route, expected valid=false score=0
 POST {{baseUrl}}/games/{{startGame.response.body.gameId}}/route
 Cookie: {{loginAlice.response.headers.Set-Cookie}}

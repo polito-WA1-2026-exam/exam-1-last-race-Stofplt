@@ -3,6 +3,7 @@ import { BrowserRouter, Navigate, Route, Routes } from "react-router";
 import AppNavbar from "./components/AppNavbar.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import { UserProvider } from "./contexts/UserContext.js";
+import ExecutionPage from "./pages/ExecutionPage.jsx";
 import InstructionsPage from "./pages/InstructionsPage.jsx";
 import LoginPage from "./pages/LoginPage.jsx";
 import PlanningPage from "./pages/PlanningPage.jsx";
@@ -32,6 +33,14 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <PlanningPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/execution/:gameId"
+                element={
+                  <ProtectedRoute>
+                    <ExecutionPage />
                   </ProtectedRoute>
                 }
               />
