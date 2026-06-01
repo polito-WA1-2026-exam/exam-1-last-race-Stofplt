@@ -3,6 +3,11 @@ GET http://localhost:3001/api/health
 
 ###
 
+### Public instructions
+GET http://localhost:3001/api/instructions
+
+###
+
 ### Login
 # @name login
 POST http://localhost:3001/api/sessions

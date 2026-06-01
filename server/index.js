@@ -57,6 +57,19 @@ app.get("/api/health", (req, res) => {
   res.json({ ok: true, service: "last-race-api" });
 });
 
+app.get("/api/instructions", (req, res) => {
+  res.json({
+    title: "Last Race",
+    rules: [
+      "Study the full metro network before starting a game.",
+      "After pressing play, build a route from the assigned start station to the assigned destination.",
+      "During planning, only station names and the list of directed segments are available.",
+      "The route must be submitted within 90 seconds.",
+      "Valid routes are executed one segment at a time, with random events changing the coin total."
+    ]
+  });
+});
+
 app.post("/api/sessions", (req, res, next) => {
   passport.authenticate("local", (err, user, info) => {
     if (err) {
@@ -295,6 +308,11 @@ app.get("/api/ranking", isLoggedIn, async (req, res, next) => {
   } catch (err) {
     next(err);
   }
+});
+
+app.use((err, req, res, next) => {
+  console.error(err);
+  res.status(500).json({ error: "Internal server error" });
 });
 
 app.listen(port, () => {
