@@ -1,16 +1,15 @@
-### Health
-GET http://localhost:3001/api/health
+@baseUrl = http://localhost:3001/api
 
-###
+### Public - health
+GET {{baseUrl}}/health
 
-### Public instructions
-GET http://localhost:3001/api/instructions
+### Public - instructions
+GET {{baseUrl}}/instructions
 
-###
 
-### Login
-# @name login
-POST http://localhost:3001/api/sessions
+### Auth - login Alice
+# @name loginAlice
+POST {{baseUrl}}/sessions
 Content-Type: application/json
 
 {
@@ -18,59 +17,81 @@ Content-Type: application/json
   "password": "race-pass-1"
 }
 
-###
+### Auth - current user
+GET {{baseUrl}}/sessions/current
+Cookie: {{loginAlice.response.headers.Set-Cookie}}
 
-### Current user
-GET http://localhost:3001/api/sessions/current
-Cookie: {{login.response.headers.Set-Cookie}}
+### Auth - bad login, expected 401
+POST {{baseUrl}}/sessions
+Content-Type: application/json
 
-###
+{
+  "username": "alice@example.com",
+  "password": "wrong-password"
+}
 
-### Full network
-GET http://localhost:3001/api/network/full
-Cookie: {{login.response.headers.Set-Cookie}}
 
-###
+### Setup - full network
+# @name fullNetwork
+GET {{baseUrl}}/network/full
+Cookie: {{loginAlice.response.headers.Set-Cookie}}
 
-### Start game
+### Setup - ranking without login, expected 401
+GET {{baseUrl}}/ranking
+
+
+### Game - start after network
 # @name startGame
-POST http://localhost:3001/api/games
-Cookie: {{login.response.headers.Set-Cookie}}
+POST {{baseUrl}}/games
+Cookie: {{loginAlice.response.headers.Set-Cookie}}
 
-###
-
-### Submit empty route, expected invalid score 0
-POST http://localhost:3001/api/games/{{startGame.response.body.gameId}}/route
-Cookie: {{login.response.headers.Set-Cookie}}
+### Game - submit empty route, expected valid=false score=0
+POST {{baseUrl}}/games/{{startGame.response.body.gameId}}/route
+Cookie: {{loginAlice.response.headers.Set-Cookie}}
 Content-Type: application/json
 
 {
   "segments": []
 }
 
-###
+### Game - result after failed route
+GET {{baseUrl}}/games/{{startGame.response.body.gameId}}/result
+Cookie: {{loginAlice.response.headers.Set-Cookie}}
 
-### Execute next step
-POST http://localhost:3001/api/games/{{startGame.response.body.gameId}}/execute/next
-Cookie: {{login.response.headers.Set-Cookie}}
 
-###
+### Game - start a second game for manual valid route testing
+# @name startValidGame
+POST {{baseUrl}}/games
+Cookie: {{loginAlice.response.headers.Set-Cookie}}
 
-### Game result
-GET http://localhost:3001/api/games/{{startGame.response.body.gameId}}/result
-Cookie: {{login.response.headers.Set-Cookie}}
+### Game - submit manual route
+# Manual helper: replace these ids with a valid route from startValidGame.startStation
+# to startValidGame.destinationStation. The sample ids below are not expected to work
+# for every random game.
+POST {{baseUrl}}/games/{{startValidGame.response.body.gameId}}/route
+Cookie: {{loginAlice.response.headers.Set-Cookie}}
+Content-Type: application/json
 
-###
+{
+  "segments": [1, 3, 5]
+}
 
-### Ranking
-GET http://localhost:3001/api/ranking
-Cookie: {{login.response.headers.Set-Cookie}}
+### Game - execute next step
+POST {{baseUrl}}/games/{{startValidGame.response.body.gameId}}/execute/next
+Cookie: {{loginAlice.response.headers.Set-Cookie}}
 
-###
+### Game - result
+GET {{baseUrl}}/games/{{startValidGame.response.body.gameId}}/result
+Cookie: {{loginAlice.response.headers.Set-Cookie}}
 
-### Login without loading network first
-# @name loginWithoutNetwork
-POST http://localhost:3001/api/sessions
+### Ranking - global best scores
+GET {{baseUrl}}/ranking
+Cookie: {{loginAlice.response.headers.Set-Cookie}}
+
+
+### Error case - login Bruno without loading network
+# @name loginBrunoNoNetwork
+POST {{baseUrl}}/sessions
 Content-Type: application/json
 
 {
@@ -78,14 +99,15 @@ Content-Type: application/json
   "password": "race-pass-2"
 }
 
-###
+### Error case - start game without network, expected 409
+POST {{baseUrl}}/games
+Cookie: {{loginBrunoNoNetwork.response.headers.Set-Cookie}}
 
-### Start game without network, expected 409
-POST http://localhost:3001/api/games
-Cookie: {{loginWithoutNetwork.response.headers.Set-Cookie}}
+### Error case - invalid game id, expected 422 after login
+GET {{baseUrl}}/games/not-a-number/result
+Cookie: {{loginAlice.response.headers.Set-Cookie}}
 
-###
 
-### Logout
-DELETE http://localhost:3001/api/sessions/current
-Cookie: {{login.response.headers.Set-Cookie}}
+### Auth - logout Alice
+DELETE {{baseUrl}}/sessions/current
+Cookie: {{loginAlice.response.headers.Set-Cookie}}
