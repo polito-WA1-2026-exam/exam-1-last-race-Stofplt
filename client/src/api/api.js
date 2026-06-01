@@ -52,6 +52,10 @@ async function getGameResult(gameId) {
   return await requestJson(`/games/${gameId}/result`);
 }
 
+async function getRanking() {
+  return await requestJson("/ranking");
+}
+
 export {
   SERVER_URL,
   createGame,
@@ -61,5 +65,6 @@ export {
   getInstructions,
   getNetwork,
   getPlanningGame,
+  getRanking,
   submitRoute
 };

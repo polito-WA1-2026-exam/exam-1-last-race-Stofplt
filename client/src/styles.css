@@ -198,6 +198,19 @@ main {
   margin: 0;
 }
 
+.ranking-page {
+  display: grid;
+  gap: 1.5rem;
+  max-width: 760px;
+}
+
+.ranking-table {
+  background: #ffffff;
+  border: 1px solid #d8d8d2;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
 .auth-panel {
   max-width: 420px;
 }
