@@ -1,14 +1,166 @@
 body {
   min-height: 100vh;
-  background: #f7f7f4;
+  background: #e8eef8;
+  color: #171720;
+  font-family: "Press Start 2P", system-ui, sans-serif;
 }
 
 main {
-  min-height: calc(100vh - 56px);
+  min-height: calc(100vh - 88px);
+}
+
+button,
+input {
+  font-family: inherit;
+}
+
+.app-content {
+  padding: 2rem;
+}
+
+.app-navbar {
+  align-items: center;
+  background: #181825;
+  border-bottom: 4px solid #171720;
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: auto 1fr auto;
+  min-height: 88px;
+  padding: 1rem 2rem;
+}
+
+.brand-link,
+.main-nav a {
+  color: #ffffff;
+  text-decoration: none;
+}
+
+.brand-link {
+  font-size: 1.15rem;
+}
+
+.brand-link:hover,
+.main-nav a:hover {
+  color: #facc15;
+}
+
+.main-nav {
+  align-items: center;
+  display: flex;
+  gap: 1.25rem;
+}
+
+.session-actions {
+  align-items: center;
+  display: flex;
+  gap: 0.75rem;
+}
+
+.user-name {
+  color: #facc15;
+  font-size: 0.8rem;
+}
+
+.logout-button {
+  align-items: center;
+  display: inline-flex;
+  height: 42px;
+  justify-content: center;
+  padding: 0.35rem;
+  width: 42px;
+}
+
+.logout-button svg {
+  fill: currentColor;
+  height: 22px;
+  width: 22px;
 }
 
 .page-section {
   max-width: 760px;
+}
+
+.home-page {
+  display: grid;
+  gap: 2rem;
+  min-height: calc(100vh - 128px);
+  padding-top: 1rem;
+}
+
+.instruction-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.instruction-card {
+  background: #fffdf2;
+  color: #171720;
+  display: grid;
+  gap: 1rem;
+  min-height: 250px;
+}
+
+.instruction-card p {
+  font-size: clamp(0.65rem, 0.9vw, 0.85rem);
+  line-height: 1.8;
+  margin: 0;
+}
+
+.instruction-number {
+  align-items: center;
+  background: #2563eb;
+  color: #ffffff;
+  display: inline-flex;
+  height: 2rem;
+  justify-content: center;
+  width: 2rem;
+}
+
+.play-row {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  padding-bottom: 1rem;
+}
+
+.play-button {
+  min-width: min(100%, 360px);
+}
+
+.dialog-backdrop {
+  align-items: center;
+  background: rgb(0 0 0 / 72%);
+  display: flex;
+  inset: 0;
+  justify-content: center;
+  padding: 1rem;
+  position: fixed;
+  z-index: 1000;
+}
+
+.login-dialog {
+  background: #f8f8f2;
+  color: #15151f;
+  max-width: 520px;
+  width: 100%;
+}
+
+.dialog-title-row {
+  align-items: center;
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.dialog-title-row h2 {
+  margin: 0;
+}
+
+.login-form {
+  display: grid;
+  gap: 1rem;
 }
 
 .execution-page,

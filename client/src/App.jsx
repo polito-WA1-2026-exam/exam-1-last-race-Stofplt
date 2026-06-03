@@ -1,4 +1,3 @@
-import { Container } from "react-bootstrap";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router";
 import AppNavbar from "./components/AppNavbar.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
@@ -17,7 +16,7 @@ function App() {
       <UserProvider>
         <AppNavbar />
         <main>
-          <Container className="py-4">
+          <div className="app-content">
             <Routes>
               <Route path="/" element={<InstructionsPage />} />
               <Route path="/login" element={<LoginPage />} />
@@ -63,7 +62,7 @@ function App() {
               />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
-          </Container>
+          </div>
         </main>
       </UserProvider>
     </BrowserRouter>

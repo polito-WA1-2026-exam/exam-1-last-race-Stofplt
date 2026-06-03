@@ -1,10 +1,12 @@
-import { Button, Container, Nav, Navbar } from "react-bootstrap";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { useUser } from "../contexts/UserContext.js";
+import LoginDialog from "./LoginDialog.jsx";
 
 function AppNavbar() {
   const { loggedIn, logout, user } = useUser();
   const navigate = useNavigate();
+  const [loginOpen, setLoginOpen] = useState(false);
 
   async function handleLogout() {
     await logout();
@@ -12,42 +14,44 @@ function AppNavbar() {
   }
 
   return (
-    <Navbar bg="dark" data-bs-theme="dark" expand="lg">
-      <Container>
-        <Navbar.Brand as={Link} to="/">
+    <>
+      <header className="app-navbar">
+        <Link className="brand-link" to="/">
           Last Race
-        </Navbar.Brand>
-        <Navbar.Toggle aria-controls="main-navbar" />
-        <Navbar.Collapse id="main-navbar">
-          <Nav className="me-auto">
-            {loggedIn && (
-              <>
-                <Nav.Link as={Link} to="/setup">
-                  Setup
-                </Nav.Link>
-                <Nav.Link as={Link} to="/ranking">
-                  Ranking
-                </Nav.Link>
-              </>
-            )}
-          </Nav>
-          <Nav className="ms-auto align-items-lg-center gap-2">
-            {loggedIn ? (
-              <>
-                <Navbar.Text>{user.name}</Navbar.Text>
-                <Button variant="outline-light" size="sm" onClick={handleLogout}>
-                  Logout
-                </Button>
-              </>
-            ) : (
-              <Button as={Link} to="/login" variant="outline-light" size="sm">
-                Login
-              </Button>
-            )}
-          </Nav>
-        </Navbar.Collapse>
-      </Container>
-    </Navbar>
+        </Link>
+        <nav className="main-nav">
+          <Link to="/ranking">Ranking</Link>
+        </nav>
+        <div className="session-actions">
+          {loggedIn ? (
+            <>
+              <span className="user-name">{user.name}</span>
+              <button
+                aria-label="Logout"
+                className="nes-btn logout-button"
+                onClick={handleLogout}
+                title="Logout"
+                type="button"
+              >
+                <svg aria-hidden="true" viewBox="0 0 24 24">
+                  <path d="M5 3h9v2H7v14h7v2H5z" />
+                  <path d="M13 7h2v3h6v4h-6v3h-2l-5-5z" />
+                </svg>
+              </button>
+            </>
+          ) : (
+            <button
+              className="nes-btn is-primary"
+              onClick={() => setLoginOpen(true)}
+              type="button"
+            >
+              Login
+            </button>
+          )}
+        </div>
+      </header>
+      <LoginDialog open={loginOpen} onClose={() => setLoginOpen(false)} />
+    </>
   );
 }
 

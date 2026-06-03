@@ -1,13 +1,15 @@
 import { useEffect, useState } from "react";
-import { Alert, Button, ListGroup, Spinner } from "react-bootstrap";
-import { Link } from "react-router";
+import { useNavigate } from "react-router";
 import { getInstructions } from "../api/api.js";
+import LoginDialog from "../components/LoginDialog.jsx";
 import { useUser } from "../contexts/UserContext.js";
 
 function InstructionsPage() {
   const { loggedIn } = useUser();
+  const navigate = useNavigate();
   const [instructions, setInstructions] = useState(null);
   const [error, setError] = useState("");
+  const [loginOpen, setLoginOpen] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -29,30 +31,49 @@ function InstructionsPage() {
     };
   }, []);
 
+  function handlePlayNow() {
+    if (loggedIn) {
+      navigate("/setup");
+    } else {
+      setLoginOpen(true);
+    }
+  }
+
   if (error) {
-    return <Alert variant="danger">{error}</Alert>;
+    return <p className="nes-text is-error">{error}</p>;
   }
 
   if (!instructions) {
     return (
       <div className="page-loader">
-        <Spinner animation="border" role="status" />
+        <p>Loading...</p>
       </div>
     );
   }
 
   return (
-    <section className="page-section">
-      <h1>{instructions.title}</h1>
-      <ListGroup className="mb-4">
-        {instructions.rules.map((rule) => (
-          <ListGroup.Item key={rule}>{rule}</ListGroup.Item>
-        ))}
-      </ListGroup>
-      <Button as={Link} to={loggedIn ? "/setup" : "/login"} variant="primary">
-        {loggedIn ? "Go to setup" : "Login"}
-      </Button>
-    </section>
+    <>
+      <section className="home-page">
+        <div className="instruction-grid">
+          {instructions.rules.map((rule, index) => (
+            <article className="nes-container instruction-card" key={rule}>
+              <span className="instruction-number">{index + 1}</span>
+              <p>{rule}</p>
+            </article>
+          ))}
+        </div>
+        <div className="play-row">
+          <button className="nes-btn is-success play-button" onClick={handlePlayNow}>
+            Play now
+          </button>
+        </div>
+      </section>
+      <LoginDialog
+        open={loginOpen}
+        onClose={() => setLoginOpen(false)}
+        onSuccess={() => navigate("/setup")}
+      />
+    </>
   );
 }
 
