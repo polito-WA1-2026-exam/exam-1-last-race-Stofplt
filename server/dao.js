@@ -93,14 +93,20 @@ async function getLines() {
 
 async function getSegments() {
   const rows = await all(
-    `SELECT id, from_station_id, to_station_id, line_id
+    `SELECT id, from_station_id, to_station_id, line_id, path
      FROM segments
      ORDER BY line_id, id`
   );
 
   return rows.map(
     (row) =>
-      new Segment(row.id, row.from_station_id, row.to_station_id, row.line_id)
+      new Segment(
+        row.id,
+        row.from_station_id,
+        row.to_station_id,
+        row.line_id,
+        row.path
+      )
   );
 }
 
@@ -161,7 +167,7 @@ async function getSegmentsByIds(segmentIds) {
 
   const placeholders = segmentIds.map(() => "?").join(",");
   const rows = await all(
-    `SELECT id, from_station_id, to_station_id, line_id
+    `SELECT id, from_station_id, to_station_id, line_id, path
      FROM segments
      WHERE id IN (${placeholders})`,
     segmentIds
@@ -169,7 +175,13 @@ async function getSegmentsByIds(segmentIds) {
 
   const segments = rows.map(
     (row) =>
-      new Segment(row.id, row.from_station_id, row.to_station_id, row.line_id)
+      new Segment(
+        row.id,
+        row.from_station_id,
+        row.to_station_id,
+        row.line_id,
+        row.path
+      )
   );
   const segmentById = new Map(segments.map((segment) => [segment.id, segment]));
 

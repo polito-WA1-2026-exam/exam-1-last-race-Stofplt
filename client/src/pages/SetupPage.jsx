@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react";
-import { Alert, Button, Spinner } from "react-bootstrap";
+import { Alert, Spinner } from "react-bootstrap";
 import { useNavigate } from "react-router";
 import { createGame, getNetwork } from "../api/api.js";
 import NetworkMap from "../components/NetworkMap.jsx";
-import SegmentList from "../components/SegmentList.jsx";
 
 function SetupPage() {
   const navigate = useNavigate();
@@ -61,20 +60,23 @@ function SetupPage() {
     <section className="setup-page">
       <div className="page-title-row">
         <h1>Setup</h1>
-        <Button disabled={starting} onClick={handleStartGame}>
-          {starting ? "Starting..." : "Play"}
-        </Button>
       </div>
       {error && <Alert variant="danger">{error}</Alert>}
-      <NetworkMap lines={network.lines} stations={network.stations} />
-      <section>
-        <h2>Segments</h2>
-        <SegmentList
-          lines={network.lines}
-          segments={network.segments}
-          stations={network.stations}
-        />
-      </section>
+      <NetworkMap
+        lines={network.lines}
+        segments={network.segments}
+        stations={network.stations}
+      />
+      <div className="setup-actions">
+        <button
+          className="nes-btn is-success nes-pointer"
+          disabled={starting}
+          onClick={handleStartGame}
+          type="button"
+        >
+          {starting ? "Starting..." : "Start"}
+        </button>
+      </div>
     </section>
   );
 }

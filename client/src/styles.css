@@ -197,6 +197,140 @@ button.nes-btn.nes-pointer:active {
   gap: 1rem;
 }
 
+.metro-map-panel {
+  --metro-bg: #1f1f1f;
+  --metro-grid: rgb(255 255 255 / 4%);
+  --metro-text: #f7f7f2;
+  --metro-shadow-opacity: 0.45;
+  aspect-ratio: 7 / 5;
+  background:
+    linear-gradient(var(--metro-grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--metro-grid) 1px, transparent 1px),
+    var(--metro-bg);
+  background-size: 8px 8px;
+  border: 4px solid #171720;
+  box-shadow: 8px 8px 0 #111119;
+  height: min(64vh, 580px);
+  margin-inline: auto;
+  max-width: 1080px;
+  min-height: 460px;
+  overflow: hidden;
+  width: 100%;
+}
+
+.setup-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-inline: auto;
+  max-width: 1080px;
+  width: 100%;
+}
+
+.metro-map {
+  display: block;
+  height: 100%;
+  width: 100%;
+}
+
+.source-line {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 8px;
+  visibility: hidden;
+}
+
+.pixel-lines {
+  pointer-events: none;
+}
+
+.map-annotations {
+  pointer-events: auto;
+}
+
+.metro-pixel,
+.metro-pixel-shadow {
+  opacity: 0;
+  shape-rendering: crispEdges;
+}
+
+.metro-pixel {
+  stroke: rgb(0 0 0 / 55%);
+  stroke-width: 0.35px;
+}
+
+.metro-pixel-shadow.is-visible {
+  opacity: var(--metro-shadow-opacity);
+}
+
+.metro-pixel.is-visible {
+  opacity: 1;
+}
+
+.station-marker {
+  opacity: 0;
+  outline: none;
+  transition: opacity 180ms steps(3, end);
+}
+
+.station,
+.interchange {
+  fill: var(--metro-text);
+  pointer-events: auto;
+  shape-rendering: crispEdges;
+  transform: scale(0.2);
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: transform 140ms ease-out;
+}
+
+.station {
+  stroke-width: 2.5px;
+}
+
+.interchange {
+  fill: var(--metro-bg);
+  stroke: var(--metro-text);
+  stroke-width: 3px;
+}
+
+.label {
+  fill: var(--metro-text);
+  font-family: "Press Start 2P", "Courier New", monospace;
+  font-size: 7px;
+  letter-spacing: 0;
+  paint-order: stroke fill;
+  pointer-events: none;
+  stroke: rgb(31 31 31 / 75%);
+  stroke-width: 2.5px;
+  transform: translateX(0);
+  transform-box: fill-box;
+  transform-origin: left center;
+  transition: transform 140ms ease-out;
+  user-select: none;
+}
+
+.station-marker.is-visible {
+  opacity: 1;
+}
+
+.station-marker.is-visible .station,
+.station-marker.is-visible .interchange {
+  transform: scale(1);
+}
+
+.station-marker.is-visible:hover .station,
+.station-marker.is-visible:focus .station,
+.station-marker.is-visible:hover .interchange,
+.station-marker.is-visible:focus .interchange {
+  transform: scale(2.4);
+}
+
+.station-marker.is-visible:hover .label,
+.station-marker.is-visible:focus .label {
+  transform: scale(1.8);
+}
+
 .network-summary {
   display: grid;
   gap: 1.5rem;

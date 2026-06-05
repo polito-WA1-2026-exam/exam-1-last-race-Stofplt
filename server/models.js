@@ -16,11 +16,12 @@ class Line {
 }
 
 class Segment {
-  constructor(id, fromStationId, toStationId, lineId) {
+  constructor(id, fromStationId, toStationId, lineId, path) {
     this.id = id;
     this.fromStationId = fromStationId;
     this.toStationId = toStationId;
     this.lineId = lineId;
+    this.path = path;
   }
 }
 
