@@ -39,7 +39,7 @@ function LoginDialog({ onClose, onSuccess, open }) {
           <h2 id="login-dialog-title">Login</h2>
           <button
             aria-label="Close login dialog"
-            className="nes-btn is-error"
+            className="nes-btn is-error nes-pointer"
             onClick={onClose}
             type="button"
           >
@@ -70,7 +70,11 @@ function LoginDialog({ onClose, onSuccess, open }) {
             value={password}
           />
 
-          <button className="nes-btn is-primary" disabled={submitting} type="submit">
+          <button
+            className="nes-btn is-primary nes-pointer"
+            disabled={submitting}
+            type="submit"
+          >
             {submitting ? "Logging in..." : "Enter"}
           </button>
         </form>

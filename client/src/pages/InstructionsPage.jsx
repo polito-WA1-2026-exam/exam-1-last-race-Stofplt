@@ -56,14 +56,17 @@ function InstructionsPage() {
       <section className="home-page">
         <div className="instruction-grid">
           {instructions.rules.map((rule, index) => (
-            <article className="nes-container instruction-card" key={rule}>
+            <article className="nes-container is-rounded instruction-card" key={rule}>
               <span className="instruction-number">{index + 1}</span>
               <p>{rule}</p>
             </article>
           ))}
         </div>
         <div className="play-row">
-          <button className="nes-btn is-success play-button" onClick={handlePlayNow}>
+          <button
+            className="nes-btn is-success nes-pointer play-button"
+            onClick={handlePlayNow}
+          >
             Play now
           </button>
         </div>

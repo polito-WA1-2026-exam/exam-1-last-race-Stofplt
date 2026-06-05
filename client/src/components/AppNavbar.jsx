@@ -16,11 +16,11 @@ function AppNavbar() {
   return (
     <>
       <header className="app-navbar">
-        <Link className="brand-link" to="/">
+        <Link className="brand-link nes-pointer" to="/">
           Last Race
         </Link>
         <nav className="main-nav">
-          <Link to="/ranking">Ranking</Link>
+          <Link className="nes-pointer" to="/ranking">Ranking</Link>
         </nav>
         <div className="session-actions">
           {loggedIn ? (
@@ -28,7 +28,7 @@ function AppNavbar() {
               <span className="user-name">{user.name}</span>
               <button
                 aria-label="Logout"
-                className="nes-btn logout-button"
+                className="nes-btn nes-pointer logout-button"
                 onClick={handleLogout}
                 title="Logout"
                 type="button"
@@ -41,7 +41,7 @@ function AppNavbar() {
             </>
           ) : (
             <button
-              className="nes-btn is-primary"
+              className="nes-btn is-primary nes-pointer"
               onClick={() => setLoginOpen(true)}
               type="button"
             >
