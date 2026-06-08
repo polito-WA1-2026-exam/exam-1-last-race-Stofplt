@@ -1,4 +1,4 @@
-const PLANNING_TIME_LIMIT_MS = 95_000;
+const PLANNING_TIME_LIMIT_MS = 90_000;
 
 function buildAdjacency(segments) {
   const adjacency = new Map();
@@ -80,6 +80,20 @@ function validateRoute(game, selectedSegments, interchangeStationIds) {
 
   if (selectedSegments.some((segment) => !segment)) {
     return { valid: false, reason: "The route contains an unknown segment" };
+  }
+
+  const usedPhysicalSegments = new Set();
+
+  for (const segment of selectedSegments) {
+    const from = Math.min(segment.fromStationId, segment.toStationId);
+    const to = Math.max(segment.fromStationId, segment.toStationId);
+    const physicalSegmentKey = `${from}-${to}`;
+
+    if (usedPhysicalSegments.has(physicalSegmentKey)) {
+      return { valid: false, reason: "The route reuses a segment" };
+    }
+
+    usedPhysicalSegments.add(physicalSegmentKey);
   }
 
   if (selectedSegments[0].fromStationId !== game.start_station_id) {

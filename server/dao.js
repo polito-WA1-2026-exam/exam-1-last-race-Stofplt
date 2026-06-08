@@ -110,6 +110,41 @@ async function getSegments() {
   );
 }
 
+async function getPlanningSegmentPairs() {
+  const segments = await getSegments();
+  const stations = await getStations();
+  const stationById = new Map(stations.map((station) => [station.id, station]));
+  const pairByKey = new Map();
+
+  for (const segment of segments) {
+    const stationAId = Math.min(segment.fromStationId, segment.toStationId);
+    const stationBId = Math.max(segment.fromStationId, segment.toStationId);
+    const pairId = `${stationAId}-${stationBId}`;
+
+    if (!pairByKey.has(pairId)) {
+      pairByKey.set(pairId, {
+        id: pairId,
+        stationAId,
+        stationAName: stationById.get(stationAId)?.name ?? String(stationAId),
+        stationBId,
+        stationBName: stationById.get(stationBId)?.name ?? String(stationBId),
+        directions: []
+      });
+    }
+
+    pairByKey.get(pairId).directions.push({
+      id: segment.id,
+      fromStationId: segment.fromStationId,
+      toStationId: segment.toStationId
+    });
+  }
+
+  return [...pairByKey.values()].map((pair) => ({
+    ...pair,
+    directions: pair.directions.sort((first, second) => first.id - second.id)
+  }));
+}
+
 async function createGame(userId, startStationId, destinationStationId) {
   const result = await run(
     `INSERT INTO games (
@@ -372,6 +407,7 @@ export {
   getStations,
   getLines,
   getSegments,
+  getPlanningSegmentPairs,
   createGame,
   getGameForUser,
   getPlanningGame,

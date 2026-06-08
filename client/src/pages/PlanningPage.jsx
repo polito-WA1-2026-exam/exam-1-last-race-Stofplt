@@ -1,54 +1,119 @@
-import { useEffect, useMemo, useState } from "react";
-import { Alert, Button, Spinner } from "react-bootstrap";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Alert, Spinner } from "react-bootstrap";
 import { useLocation, useNavigate, useParams } from "react-router";
 import {
-  getNetwork,
+  getNetworkStations,
   getPlanningGame,
+  getPlanningNetwork,
   submitRoute
 } from "../api/api.js";
+import PlanningMap from "../components/PlanningMap.jsx";
 import RouteBuilder from "../components/RouteBuilder.jsx";
 import SegmentList from "../components/SegmentList.jsx";
+
+const PLANNING_SECONDS = 90;
 
 function PlanningPage() {
   const { gameId } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
   const [game, setGame] = useState(location.state ?? null);
+  const [mapStations, setMapStations] = useState([]);
   const [network, setNetwork] = useState(null);
   const [selectedSegmentIds, setSelectedSegmentIds] = useState([]);
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [timeLeft, setTimeLeft] = useState(PLANNING_SECONDS);
+  const selectedSegmentIdsRef = useRef([]);
+  const submittingRef = useRef(false);
+  const autoSubmittedRef = useRef(false);
 
-  const selectedSegments = useMemo(() => {
+  useEffect(() => {
+    selectedSegmentIdsRef.current = selectedSegmentIds;
+  }, [selectedSegmentIds]);
+
+  const segmentById = useMemo(() => {
     if (!network) {
-      return [];
+      return new Map();
     }
 
-    const segmentById = new Map(
-      network.segments.map((segment) => [segment.id, segment])
+    return new Map(
+      network.segmentPairs
+        .flatMap((pair) => pair.directions)
+        .map((segment) => [segment.id, segment])
     );
+  }, [network]);
 
+  const selectedSegments = useMemo(() => {
     return selectedSegmentIds
       .map((segmentId) => segmentById.get(segmentId))
       .filter(Boolean);
-  }, [network, selectedSegmentIds]);
+  }, [segmentById, selectedSegmentIds]);
 
-  const selectedCounts = useMemo(() => {
-    const counts = new Map();
-
-    for (const segmentId of selectedSegmentIds) {
-      counts.set(segmentId, (counts.get(segmentId) ?? 0) + 1);
+  const segmentIdToPairId = useMemo(() => {
+    if (!network) {
+      return new Map();
     }
 
-    return counts;
-  }, [selectedSegmentIds]);
+    const pairs = new Map();
+
+    for (const pair of network.segmentPairs) {
+      for (const direction of pair.directions) {
+        pairs.set(direction.id, pair.id);
+      }
+    }
+
+    return pairs;
+  }, [network]);
+  const pairById = useMemo(() => {
+    if (!network) {
+      return new Map();
+    }
+
+    return new Map(network.segmentPairs.map((pair) => [pair.id, pair]));
+  }, [network]);
+
+  const selectedPairIds = useMemo(
+    () =>
+      new Set(
+        selectedSegmentIds
+          .map((segmentId) => segmentIdToPairId.get(segmentId))
+          .filter(Boolean)
+      ),
+    [segmentIdToPairId, selectedSegmentIds]
+  );
+  const selectedSegmentIdByPairId = useMemo(() => {
+    const selectedPairs = new Map();
+
+    for (const segmentId of selectedSegmentIds) {
+      const pairId = segmentIdToPairId.get(segmentId);
+
+      if (pairId) {
+        selectedPairs.set(pairId, segmentId);
+      }
+    }
+
+    return selectedPairs;
+  }, [segmentIdToPairId, selectedSegmentIds]);
+  const timePercentage = Math.ceil((timeLeft / PLANNING_SECONDS) * 100);
+  const timerClass =
+    timePercentage <= 20
+      ? "is-error"
+      : timePercentage <= 50
+        ? "is-warning"
+        : "is-success";
 
   useEffect(() => {
     let active = true;
 
-    Promise.all([getNetwork(), getPlanningGame(gameId)])
-      .then(([networkData, gameData]) => {
+    Promise.all([
+      getPlanningNetwork(),
+      getNetworkStations(),
+      getPlanningGame(gameId)
+    ])
+      .then(([networkData, stationData, gameData]) => {
         if (active) {
+          setMapStations(stationData.stations);
           setNetwork(networkData);
           setGame(gameData);
         }
@@ -64,36 +129,95 @@ function PlanningPage() {
     };
   }, [gameId]);
 
-  function addSegment(segmentId) {
-    setSelectedSegmentIds((current) => [...current, segmentId]);
+  const submitSelectedRoute = useCallback(
+    async (segmentIds = selectedSegmentIdsRef.current) => {
+      if (submittingRef.current) {
+        return;
+      }
+
+      setError("");
+      setSubmitting(true);
+      submittingRef.current = true;
+
+      try {
+        const result = await submitRoute(Number(gameId), segmentIds);
+
+        if (!result.valid) {
+          setError(result.reason || "The route is not valid");
+          return;
+        }
+
+        navigate(`/execution/${gameId}`);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setSubmitting(false);
+        submittingRef.current = false;
+      }
+    },
+    [gameId, navigate]
+  );
+
+  useEffect(() => {
+    if (!network || !game) {
+      return undefined;
+    }
+
+    const startedAt = Date.now();
+    const timerId = window.setInterval(() => {
+      const elapsedSeconds = Math.floor((Date.now() - startedAt) / 1000);
+      setTimeLeft(Math.max(PLANNING_SECONDS - elapsedSeconds, 0));
+    }, 250);
+    const timeoutId = window.setTimeout(() => {
+      if (!autoSubmittedRef.current) {
+        autoSubmittedRef.current = true;
+        submitSelectedRoute(selectedSegmentIdsRef.current);
+      }
+    }, PLANNING_SECONDS * 1000);
+
+    return () => {
+      window.clearInterval(timerId);
+      window.clearTimeout(timeoutId);
+    };
+  }, [game, network, submitSelectedRoute]);
+
+  function toggleSegment(pairId, segmentId) {
+    setSelectedSegmentIds((current) => {
+      if (current.some((id) => segmentIdToPairId.get(id) === pairId)) {
+        return current.filter((id) => segmentIdToPairId.get(id) !== pairId);
+      }
+
+      return [...current, segmentId];
+    });
   }
 
-  function removeLastSegment() {
-    setSelectedSegmentIds((current) => current.slice(0, -1));
+  function switchSelectedDirection(segmentId) {
+    const pairId = segmentIdToPairId.get(segmentId);
+    const pair = pairById.get(pairId);
+
+    if (!pair) {
+      return;
+    }
+
+    const replacement = pair.directions.find(
+      (direction) => direction.id !== segmentId
+    );
+
+    if (!replacement) {
+      return;
+    }
+
+    setSelectedSegmentIds((current) =>
+      current.map((id) => (id === segmentId ? replacement.id : id))
+    );
+  }
+
+  function removeSelectedSegment(segmentId) {
+    setSelectedSegmentIds((current) => current.filter((id) => id !== segmentId));
   }
 
   function clearRoute() {
     setSelectedSegmentIds([]);
-  }
-
-  async function handleSubmitRoute() {
-    setError("");
-    setSubmitting(true);
-
-    try {
-      const result = await submitRoute(Number(gameId), selectedSegmentIds);
-
-      if (!result.valid) {
-        setError(result.reason || "The route is not valid");
-        return;
-      }
-
-      navigate(`/execution/${gameId}`);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setSubmitting(false);
-    }
   }
 
   if (error && (!network || !game)) {
@@ -110,52 +234,52 @@ function PlanningPage() {
 
   return (
     <section className="planning-page">
-      <div className="page-title-row">
-        <h1>Planning</h1>
-        <Button
-          disabled={selectedSegmentIds.length === 0 || submitting}
-          onClick={handleSubmitRoute}
-        >
-          {submitting ? "Submitting..." : "Submit route"}
-        </Button>
-      </div>
       {error && <Alert variant="danger">{error}</Alert>}
-      <dl className="planning-summary">
-        <div>
-          <dt>Game</dt>
-          <dd>{gameId}</dd>
-        </div>
-        <div>
-          <dt>Start</dt>
-          <dd>{game.startStation.name}</dd>
-        </div>
-        <div>
-          <dt>Destination</dt>
-          <dd>{game.destinationStation.name}</dd>
-        </div>
-      </dl>
 
-      <section>
-        <h2>Selected route</h2>
-        <RouteBuilder
-          lines={network.lines}
-          onClear={clearRoute}
-          onRemoveLast={removeLastSegment}
-          segments={selectedSegments}
-          stations={network.stations}
-        />
-      </section>
+      <div className="planning-board">
+        <section className="planning-segments-panel">
+          <PlanningMap
+            destinationStationId={game.destinationStation.id}
+            startStationId={game.startStation.id}
+            stations={mapStations}
+          />
+          <h2>Available segments</h2>
+          <SegmentList
+            onSwitchSelected={switchSelectedDirection}
+            onToggle={toggleSegment}
+            selectedSegmentIdByPairId={selectedSegmentIdByPairId}
+            selectedPairIds={selectedPairIds}
+            segmentPairs={network.segmentPairs}
+            stations={network.stations}
+          />
+        </section>
 
-      <section>
-        <h2>Available segments</h2>
-        <SegmentList
-          lines={network.lines}
-          onSelect={addSegment}
-          selectedCounts={selectedCounts}
-          segments={network.segments}
-          stations={network.stations}
-        />
-      </section>
+        <aside className="planning-route-panel">
+          <div className="planning-status">
+            <div className="planning-timer nes-container is-rounded">
+              <progress
+                className={`nes-progress ${timerClass}`}
+                max="100"
+                value={timePercentage}
+              />
+              <span>{timeLeft}s</span>
+            </div>
+            <div className="planning-coins nes-container is-rounded">
+              <i className="nes-icon coin is-small" aria-hidden="true" />
+              <span>20</span>
+            </div>
+          </div>
+          <h2>Selected route</h2>
+          <RouteBuilder
+            onClear={clearRoute}
+            onRemoveSegment={removeSelectedSegment}
+            onSubmit={() => submitSelectedRoute(selectedSegmentIds)}
+            segments={selectedSegments}
+            stations={network.stations}
+            submitting={submitting}
+          />
+        </aside>
+      </div>
     </section>
   );
 }

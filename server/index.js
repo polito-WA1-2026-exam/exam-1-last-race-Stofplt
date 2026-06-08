@@ -16,6 +16,7 @@ import {
   getLines,
   getNextStep,
   getPlanningGame,
+  getPlanningSegmentPairs,
   getRanking,
   getRandomEvent,
   getSegments,
@@ -64,7 +65,7 @@ app.get("/api/instructions", (req, res) => {
     rules: [
       "Study the full metro network before starting a game.",
       "After pressing play, build a route from the assigned start station to the assigned destination.",
-      "During planning, only station names and the list of directed segments are available.",
+      "During planning, only station names and connected station pairs are available.",
       "The route must be submitted within 90 seconds.",
       "Valid routes are executed one segment at a time, with random events changing the coin total."
     ]
@@ -112,6 +113,29 @@ app.get("/api/network/full", isLoggedIn, async (req, res, next) => {
 
     req.session.networkLoaded = true;
     res.json({ stations, lines, segments });
+  } catch (err) {
+    next(err);
+  }
+});
+
+app.get("/api/network/stations", isLoggedIn, async (req, res, next) => {
+  try {
+    const stations = await getStations();
+
+    res.json({ stations });
+  } catch (err) {
+    next(err);
+  }
+});
+
+app.get("/api/network/planning", isLoggedIn, async (req, res, next) => {
+  try {
+    const [stations, segmentPairs] = await Promise.all([
+      getStations(),
+      getPlanningSegmentPairs()
+    ]);
+
+    res.json({ stations, segmentPairs });
   } catch (err) {
     next(err);
   }

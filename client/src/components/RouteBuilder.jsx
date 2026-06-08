@@ -1,46 +1,66 @@
 function RouteBuilder({
-  lines = [],
   onClear,
-  onRemoveLast,
+  onRemoveSegment,
+  onSubmit,
   segments = [],
+  submitting = false,
   stations = []
 }) {
   const stationById = new Map(stations.map((station) => [station.id, station]));
-  const lineById = new Map(lines.map((line) => [line.id, line]));
-
-  if (segments.length === 0) {
-    return (
-      <div className="route-builder empty-route">
-        <p className="mb-0">Select segments from the list below.</p>
-      </div>
-    );
-  }
 
   return (
-    <div className="route-builder">
-      <ol className="route-steps">
-        {segments.map((segment, index) => (
-          <li key={`${segment.id}-${index}`}>
-            <span className="segment-id">#{segment.id}</span>
-            <span>
-              {stationById.get(segment.fromStationId)?.name ?? segment.fromStationId}
-            </span>
-            <span aria-hidden="true">{"->"}</span>
-            <span>
-              {stationById.get(segment.toStationId)?.name ?? segment.toStationId}
-            </span>
-            <span className="segment-line">
-              {lineById.get(segment.lineId)?.name ?? segment.lineId}
-            </span>
-          </li>
-        ))}
-      </ol>
+    <div
+      className={`route-builder nes-container is-rounded${
+        segments.length === 0 ? " empty-route" : ""
+      }`}
+    >
+      {segments.length === 0 ? (
+        <p>Select segments from the list.</p>
+      ) : (
+        <ol className="route-steps">
+          {segments.map((segment, index) => (
+            <li
+              className="route-step-item nes-container is-rounded"
+              key={`${segment.id}-${index}`}
+            >
+              <span className="route-step-index">{index + 1}</span>
+              <div className="route-step-content">
+                <span>
+                  {stationById.get(segment.fromStationId)?.name ??
+                    segment.fromStationId}{" "}
+                  {"->"}{" "}
+                  {stationById.get(segment.toStationId)?.name ??
+                    segment.toStationId}
+                </span>
+              </div>
+              <button
+                aria-label="Remove selected segment"
+                className="nes-btn is-error nes-pointer route-remove-button"
+                onClick={() => onRemoveSegment(segment.id)}
+                type="button"
+              >
+                <i className="nes-icon close is-small" aria-hidden="true" />
+              </button>
+            </li>
+          ))}
+        </ol>
+      )}
       <div className="route-actions">
-        <button onClick={onRemoveLast} type="button">
-          Remove last
-        </button>
-        <button onClick={onClear} type="button">
+        <button
+          className="nes-btn is-error nes-pointer"
+          disabled={segments.length === 0 || submitting}
+          onClick={onClear}
+          type="button"
+        >
           Clear
+        </button>
+        <button
+          className="nes-btn is-success nes-pointer"
+          disabled={submitting}
+          onClick={onSubmit}
+          type="button"
+        >
+          {submitting ? "Submitting..." : "Submit"}
         </button>
       </div>
     </div>

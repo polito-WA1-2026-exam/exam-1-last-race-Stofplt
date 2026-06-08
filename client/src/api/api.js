@@ -26,6 +26,14 @@ async function getNetwork() {
   return await requestJson("/network/full");
 }
 
+async function getPlanningNetwork() {
+  return await requestJson("/network/planning");
+}
+
+async function getNetworkStations() {
+  return await requestJson("/network/stations");
+}
+
 async function createGame() {
   return await requestJson("/games", { method: "POST" });
 }
@@ -64,6 +72,8 @@ export {
   getHealth,
   getInstructions,
   getNetwork,
+  getNetworkStations,
+  getPlanningNetwork,
   getPlanningGame,
   getRanking,
   submitRoute
