@@ -108,8 +108,34 @@ function ExecutionPage() {
         />
       </div>
 
-      {completed ? (
-        <div className="execution-actions d-flex justify-content-end w-100 mx-auto">
+      <div className="execution-bottom mx-auto">
+        <div className="execution-event nes-container is-rounded d-flex align-items-center justify-content-center gap-2">
+          {lastEvent ? (
+            <>
+              <span className="execution-event-text m-0">
+                {lastEvent.description}
+              </span>
+              <span
+                className={`execution-event-effect${
+                  lastEvent.effect > 0
+                    ? " is-positive"
+                    : lastEvent.effect < 0
+                      ? " is-negative"
+                      : ""
+                }`}
+              >
+                {lastEvent.effect > 0
+                  ? `+${lastEvent.effect}`
+                  : lastEvent.effect}
+              </span>
+            </>
+          ) : (
+            <span className="execution-event-text m-0">
+              Press Next to execute the first segment.
+            </span>
+          )}
+        </div>
+        {completed ? (
           <button
             className="nes-btn is-success nes-pointer"
             onClick={() => navigate(`/result/${gameId}`)}
@@ -117,35 +143,7 @@ function ExecutionPage() {
           >
             View result
           </button>
-        </div>
-      ) : (
-        <div className="execution-bottom mx-auto">
-          <div className="execution-event nes-container is-rounded d-flex align-items-center justify-content-center gap-2">
-            {lastEvent ? (
-              <>
-                <span className="execution-event-text m-0">
-                  {lastEvent.description}
-                </span>
-                <span
-                  className={`execution-event-effect${
-                    lastEvent.effect > 0
-                      ? " is-positive"
-                      : lastEvent.effect < 0
-                        ? " is-negative"
-                        : ""
-                  }`}
-                >
-                  {lastEvent.effect > 0
-                    ? `+${lastEvent.effect}`
-                    : lastEvent.effect}
-                </span>
-              </>
-            ) : (
-              <span className="execution-event-text m-0">
-                Press Next to execute the first segment.
-              </span>
-            )}
-          </div>
+        ) : (
           <button
             className="nes-btn is-success nes-pointer"
             disabled={executing}
@@ -154,8 +152,8 @@ function ExecutionPage() {
           >
             {executing ? "Executing..." : "Next"}
           </button>
-        </div>
-      )}
+        )}
+      </div>
     </section>
   );
 }
