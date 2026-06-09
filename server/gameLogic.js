@@ -1,5 +1,12 @@
 const PLANNING_TIME_LIMIT_MS = 90_000;
 
+// ┌─────────────────────────────────────────────────────────┐
+// │ DEBUG: metti a true per avere sempre la stessa tratta. │
+// └─────────────────────────────────────────────────────────┘
+const DEBUG_FIXED_ROUTE = true;
+const FIXED_START_ID = 1; // Shady Grove
+const FIXED_DEST_ID = 10; // Waterfront
+
 function buildAdjacency(segments) {
   const adjacency = new Map();
 
@@ -38,6 +45,14 @@ function pickRandom(items) {
 }
 
 function pickStartAndDestination(stations, segments, minDistance = 3) {
+  if (DEBUG_FIXED_ROUTE) {
+    const start = stations.find((s) => s.id === FIXED_START_ID);
+    const dest = stations.find((s) => s.id === FIXED_DEST_ID);
+    if (start && dest) {
+      return { startStation: start, destinationStation: dest };
+    }
+  }
+
   const validPairs = [];
 
   for (const startStation of stations) {
@@ -53,7 +68,9 @@ function pickStartAndDestination(stations, segments, minDistance = 3) {
   }
 
   if (validPairs.length === 0) {
-    throw new Error("The network does not contain valid start/destination pairs");
+    throw new Error(
+      "The network does not contain valid start/destination pairs",
+    );
   }
 
   return pickRandom(validPairs);
@@ -64,12 +81,12 @@ function buildGameStartPayload(gameId, pair) {
     gameId,
     startStation: {
       id: pair.startStation.id,
-      name: pair.startStation.name
+      name: pair.startStation.name,
     },
     destinationStation: {
       id: pair.destinationStation.id,
-      name: pair.destinationStation.name
-    }
+      name: pair.destinationStation.name,
+    },
   };
 }
 
@@ -99,7 +116,7 @@ function validateRoute(game, selectedSegments, interchangeStationIds) {
   if (selectedSegments[0].fromStationId !== game.start_station_id) {
     return {
       valid: false,
-      reason: "The route does not start from the assigned station"
+      reason: "The route does not start from the assigned station",
     };
   }
 
@@ -110,7 +127,7 @@ function validateRoute(game, selectedSegments, interchangeStationIds) {
     if (current.toStationId !== next.fromStationId) {
       return {
         valid: false,
-        reason: "The route contains non-consecutive segments"
+        reason: "The route contains non-consecutive segments",
       };
     }
 
@@ -120,7 +137,10 @@ function validateRoute(game, selectedSegments, interchangeStationIds) {
       current.lineId !== next.lineId &&
       !interchangeStationIds.has(current.toStationId)
     ) {
-      return { valid: false, reason: "Line change outside interchange station" };
+      return {
+        valid: false,
+        reason: "Line change outside interchange station",
+      };
     }
   }
 
@@ -130,7 +150,7 @@ function validateRoute(game, selectedSegments, interchangeStationIds) {
   ) {
     return {
       valid: false,
-      reason: "The route does not reach the assigned destination"
+      reason: "The route does not reach the assigned destination",
     };
   }
 
@@ -154,11 +174,11 @@ function buildResultPayload(game, steps) {
     score: game.final_score,
     startStation: {
       id: game.start_station_id,
-      name: game.start_station_name
+      name: game.start_station_name,
     },
     destinationStation: {
       id: game.destination_station_id,
-      name: game.destination_station_name
+      name: game.destination_station_name,
     },
     steps: steps.map((step) => {
       if (step.event_effect !== null) {
@@ -176,11 +196,11 @@ function buildResultPayload(game, steps) {
             ? null
             : {
                 description: step.event_description,
-                effect: step.event_effect
+                effect: step.event_effect,
               },
-        coins: step.event_effect === null ? null : coins
+        coins: step.event_effect === null ? null : coins,
       };
-    })
+    }),
   };
 }
 
@@ -191,5 +211,5 @@ export {
   validateRoute,
   hasPlanningTimeExpired,
   applyEventEffect,
-  buildResultPayload
+  buildResultPayload,
 };

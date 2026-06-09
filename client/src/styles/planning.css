@@ -157,7 +157,7 @@
 
 .planning-map-label {
     fill: var(--planning-map-text); /* Uses the shared map label color. */
-    font-size: 10px; /* Keeps station labels readable in the full-size map. */
+    font-size: 7px; /* Keeps station labels readable in the full-size map. */
     stroke-width: 2.5px; /* Matches setup-map label outline thickness. */
 }
 
