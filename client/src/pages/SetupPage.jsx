@@ -58,7 +58,7 @@ function SetupPage() {
 
   return (
     <section className="setup-page d-grid gap-4">
-      <div className="d-flex align-items-center justify-content-between gap-3">
+      <div className="setup-header d-flex align-items-center justify-content-between gap-3">
         <h1>Setup</h1>
       </div>
       {error && <Alert variant="danger">{error}</Alert>}

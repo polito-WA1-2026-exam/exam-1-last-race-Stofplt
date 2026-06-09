@@ -5,7 +5,7 @@ import {
   getNetworkStations,
   getPlanningGame,
   getPlanningNetwork,
-  submitRoute
+  submitRoute,
 } from "../api/api.js";
 import PlanningMap from "../components/PlanningMap.jsx";
 import RouteBuilder from "../components/RouteBuilder.jsx";
@@ -40,7 +40,7 @@ function PlanningPage() {
     return new Map(
       network.segmentPairs
         .flatMap((pair) => pair.directions)
-        .map((segment) => [segment.id, segment])
+        .map((segment) => [segment.id, segment]),
     );
   }, [network]);
 
@@ -78,9 +78,9 @@ function PlanningPage() {
       new Set(
         selectedSegmentIds
           .map((segmentId) => segmentIdToPairId.get(segmentId))
-          .filter(Boolean)
+          .filter(Boolean),
       ),
-    [segmentIdToPairId, selectedSegmentIds]
+    [segmentIdToPairId, selectedSegmentIds],
   );
   const selectedSegmentIdByPairId = useMemo(() => {
     const selectedPairs = new Map();
@@ -109,7 +109,7 @@ function PlanningPage() {
     Promise.all([
       getPlanningNetwork(),
       getNetworkStations(),
-      getPlanningGame(gameId)
+      getPlanningGame(gameId),
     ])
       .then(([networkData, stationData, gameData]) => {
         if (active) {
@@ -155,7 +155,7 @@ function PlanningPage() {
         submittingRef.current = false;
       }
     },
-    [gameId, navigate]
+    [gameId, navigate],
   );
 
   useEffect(() => {
@@ -200,7 +200,7 @@ function PlanningPage() {
     }
 
     const replacement = pair.directions.find(
-      (direction) => direction.id !== segmentId
+      (direction) => direction.id !== segmentId,
     );
 
     if (!replacement) {
@@ -208,12 +208,14 @@ function PlanningPage() {
     }
 
     setSelectedSegmentIds((current) =>
-      current.map((id) => (id === segmentId ? replacement.id : id))
+      current.map((id) => (id === segmentId ? replacement.id : id)),
     );
   }
 
   function removeSelectedSegment(segmentId) {
-    setSelectedSegmentIds((current) => current.filter((id) => id !== segmentId));
+    setSelectedSegmentIds((current) =>
+      current.filter((id) => id !== segmentId),
+    );
   }
 
   function clearRoute() {
@@ -234,6 +236,10 @@ function PlanningPage() {
 
   return (
     <section className="planning-page container-fluid py-4">
+      <div className="d-flex align-items-center justify-content-between gap-3 mb-3">
+        <h1>Planning</h1>
+      </div>
+
       {error && <Alert variant="danger">{error}</Alert>}
 
       <div className="planning-board">

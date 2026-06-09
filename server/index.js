@@ -23,7 +23,7 @@ import {
   getSegmentsByIds,
   getStations,
   hasPendingSteps,
-  savePlannedRoute
+  savePlannedRoute,
 } from "./dao.js";
 import {
   applyEventEffect,
@@ -31,7 +31,7 @@ import {
   buildResultPayload,
   hasPlanningTimeExpired,
   pickStartAndDestination,
-  validateRoute
+  validateRoute,
 } from "./gameLogic.js";
 
 const app = express();
@@ -43,15 +43,15 @@ app.use(express.json());
 app.use(
   cors({
     origin: "http://localhost:5173",
-    credentials: true
-  })
+    credentials: true,
+  }),
 );
 app.use(
   session({
     secret: "last-race-development-secret",
     resave: false,
-    saveUninitialized: false
-  })
+    saveUninitialized: false,
+  }),
 );
 app.use(passport.authenticate("session"));
 
@@ -67,8 +67,8 @@ app.get("/api/instructions", (req, res) => {
       "After pressing play, build a route from the assigned start station to the assigned destination.",
       "During planning, only station names and connected station pairs are available.",
       "The route must be submitted within 90 seconds.",
-      "Valid routes are executed one segment at a time, with random events changing the coin total."
-    ]
+      "Valid routes are executed one segment at a time, with random events changing the coin total.",
+    ],
   });
 });
 
@@ -108,7 +108,7 @@ app.get("/api/network/full", isLoggedIn, async (req, res, next) => {
     const [stations, lines, segments] = await Promise.all([
       getStations(),
       getLines(),
-      getSegments()
+      getSegments(),
     ]);
 
     req.session.networkLoaded = true;
@@ -132,7 +132,7 @@ app.get("/api/network/planning", isLoggedIn, async (req, res, next) => {
   try {
     const [stations, segmentPairs] = await Promise.all([
       getStations(),
-      getPlanningSegmentPairs()
+      getPlanningSegmentPairs(),
     ]);
 
     res.json({ stations, segmentPairs });
@@ -145,19 +145,19 @@ app.post("/api/games", isLoggedIn, async (req, res, next) => {
   try {
     if (!req.session.networkLoaded) {
       return res.status(409).json({
-        error: "Load the network before starting a game"
+        error: "Load the network before starting a game",
       });
     }
 
     const [stations, segments] = await Promise.all([
       getStations(),
-      getSegments()
+      getSegments(),
     ]);
     const pair = pickStartAndDestination(stations, segments);
     const gameId = await createGame(
       req.user.id,
       pair.startStation.id,
-      pair.destinationStation.id
+      pair.destinationStation.id,
     );
 
     req.session.gameStartTimes ??= {};
@@ -193,12 +193,12 @@ app.get("/api/games/:id/planning", isLoggedIn, async (req, res, next) => {
       status: game.status,
       startStation: {
         id: game.start_station_id,
-        name: game.start_station_name
+        name: game.start_station_name,
       },
       destinationStation: {
         id: game.destination_station_id,
-        name: game.destination_station_name
-      }
+        name: game.destination_station_name,
+      },
     });
   } catch (err) {
     next(err);
@@ -217,7 +217,7 @@ app.post("/api/games/:id/route", isLoggedIn, async (req, res, next) => {
     }
     if (
       req.body.segments.some(
-        (segmentId) => !Number.isInteger(segmentId) || segmentId <= 0
+        (segmentId) => !Number.isInteger(segmentId) || segmentId <= 0,
       )
     ) {
       return res
@@ -244,13 +244,17 @@ app.post("/api/games/:id/route", isLoggedIn, async (req, res, next) => {
       return res.json({
         valid: false,
         score: 0,
-        reason: "Planning time expired"
+        reason: "Planning time expired",
       });
     }
 
     const selectedSegments = await getSegmentsByIds(req.body.segments);
     const interchangeStationIds = await getInterchangeStationIds();
-    const validation = validateRoute(game, selectedSegments, interchangeStationIds);
+    const validation = validateRoute(
+      game,
+      selectedSegments,
+      interchangeStationIds,
+    );
 
     if (!validation.valid) {
       await failGame(gameId);
@@ -258,7 +262,7 @@ app.post("/api/games/:id/route", isLoggedIn, async (req, res, next) => {
       return res.json({
         valid: false,
         score: 0,
-        reason: validation.reason
+        reason: validation.reason,
       });
     }
 
@@ -268,7 +272,7 @@ app.post("/api/games/:id/route", isLoggedIn, async (req, res, next) => {
     res.json({
       valid: true,
       gameId,
-      status: "executing"
+      status: "executing",
     });
   } catch (err) {
     next(err);
@@ -302,7 +306,7 @@ app.post("/api/games/:id/execute/next", isLoggedIn, async (req, res, next) => {
 
     const [currentCoins, event] = await Promise.all([
       getCurrentCoins(gameId),
-      getRandomEvent()
+      getRandomEvent(),
     ]);
     const updatedCoins = applyEventEffect(currentCoins, event);
 
@@ -323,12 +327,14 @@ app.post("/api/games/:id/execute/next", isLoggedIn, async (req, res, next) => {
         fromStation: step.from_station_name,
         toStation: step.to_station_name,
         line: step.line_name,
+        lineId: step.line_id,
+        path: step.path,
         event: {
           description: event.description,
-          effect: event.effect
+          effect: event.effect,
         },
-        coins: updatedCoins
-      }
+        coins: updatedCoins,
+      },
     });
   } catch (err) {
     next(err);
@@ -363,8 +369,8 @@ app.get("/api/ranking", isLoggedIn, async (req, res, next) => {
       ranking.map((entry) => ({
         userId: entry.user_id,
         name: entry.name,
-        bestScore: entry.best_score
-      }))
+        bestScore: entry.best_score,
+      })),
     );
   } catch (err) {
     next(err);

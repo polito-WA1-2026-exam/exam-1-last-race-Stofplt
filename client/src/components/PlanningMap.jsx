@@ -37,7 +37,7 @@ function getLabelOffsetByStation(stations) {
       .forEach((station, index) => {
         offsetByStation.set(
           station.id,
-          index % 2 === 0 ? LABEL_LOWER_Y : LABEL_RAISE_Y
+          index % 2 === 0 ? LABEL_LOWER_Y : LABEL_RAISE_Y,
         );
       });
   });
@@ -45,13 +45,8 @@ function getLabelOffsetByStation(stations) {
   return offsetByStation;
 }
 
-function PlanningMap({
-  destinationStationId,
-  startStationId,
-  stations = []
-}) {
+function PlanningMap({ destinationStationId, startStationId, stations = [] }) {
   const labelOffsetByStation = getLabelOffsetByStation(stations);
-  const viewBox = buildViewBox(stations);
 
   function getStationClass(stationId) {
     if (stationId === startStationId) {
@@ -76,7 +71,7 @@ function PlanningMap({
         aria-label="Planning network map"
         className="planning-map"
         role="img"
-        viewBox={viewBox}
+        viewBox="100 60 660 490"
       >
         <g className="planning-map-stations">
           {stations.map((station) => {

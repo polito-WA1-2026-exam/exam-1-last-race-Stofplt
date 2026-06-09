@@ -1,44 +1,109 @@
 /* Small result/execution/ranking styles that remain more concise than repeated JSX classes. */
+.execution-page {
+    --execution-gap: 1rem;
+}
+
+.execution-header,
+.execution-actions,
+.execution-bottom {
+    margin-inline: auto;
+    max-width: 1080px;
+    position: relative;
+    width: 100%;
+}
+
+.execution-bottom .execution-event {
+    margin: 0 auto;
+}
+
+.execution-bottom .nes-btn {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.execution-map-wrapper {
+    margin-inline: auto;
+    max-width: 1080px;
+    width: 100%;
+}
+
+.execution-coins {
+    background: #ffffff;
+    box-sizing: border-box;
+    font-family: "Press Start 2P", system-ui, sans-serif;
+    font-size: 0.95rem;
+    padding: 0.85rem;
+}
+
+.execution-event {
+    background: #ffffff;
+    box-sizing: border-box;
+    max-width: 1080px;
+    padding: 0.65rem 0.85rem;
+    width: 50%;
+}
+
+.execution-event-text {
+    font-family: "Press Start 2P", system-ui, sans-serif;
+    font-size: 0.72rem;
+    line-height: 1.6;
+}
+
+.execution-event-effect {
+    font-family: "Press Start 2P", system-ui, sans-serif;
+    font-size: 1.1rem;
+}
+
+.execution-event-effect.is-positive {
+    color: #92cc41;
+}
+
+.execution-event-effect.is-negative {
+    color: #e76e55;
+}
+
 .execution-step {
-  background: #ffffff; /* Matches the app's light panel color. */
-  border: 1px solid #d8d8d2; /* Adds a subtle separator without a full NES container. */
-  border-radius: 8px; /* Keeps execution cards compact and readable. */
-  padding: 0.9rem; /* Gives execution details readable spacing. */
+    background: #ffffff; /* Matches the app's light panel color. */
+    border: 1px solid #d8d8d2; /* Adds a subtle separator without a full NES container. */
+    border-radius: 8px; /* Keeps execution cards compact and readable. */
+    padding: 0.9rem; /* Gives execution details readable spacing. */
 }
 
 .planning-summary {
-  background: #ffffff; /* Gives result summary a simple white panel. */
-  border: 1px solid #d8d8d2; /* Separates the summary from the page background. */
-  border-radius: 8px; /* Matches execution card rounding. */
-  display: grid; /* Stacks key/value rows. */
+    background: #ffffff; /* Gives result summary a simple white panel. */
+    border: 1px solid #d8d8d2; /* Separates the summary from the page background. */
+    border-radius: 8px; /* Matches execution card rounding. */
+    display: grid; /* Stacks key/value rows. */
 }
 
 .planning-summary div {
-  display: grid; /* Aligns result labels and values in columns. */
-  gap: 1rem; /* Separates label and value. */
-  grid-template-columns: 8rem 1fr; /* Keeps result labels aligned. */
-  padding: 0.75rem 1rem; /* Gives each summary row comfortable spacing. */
+    display: grid; /* Aligns result labels and values in columns. */
+    gap: 1rem; /* Separates label and value. */
+    grid-template-columns: 8rem 1fr; /* Keeps result labels aligned. */
+    padding: 0.75rem 1rem; /* Gives each summary row comfortable spacing. */
 }
 
 .planning-summary div + div {
-  border-top: 1px solid #eeeeea; /* Separates summary rows. */
+    border-top: 1px solid #eeeeea; /* Separates summary rows. */
 }
 
 .planning-summary dt {
-  color: #66665f; /* Makes summary labels secondary. */
+    color: #66665f; /* Makes summary labels secondary. */
 }
 
 .planning-summary dd {
-  margin: 0; /* Removes default definition-list margin. */
+    margin: 0; /* Removes default definition-list margin. */
 }
 
 .ranking-page {
-  max-width: 760px; /* Keeps the ranking table readable on wide screens. */
+    max-width: 760px; /* Keeps the ranking table readable on wide screens. */
 }
 
 .ranking-table {
-  background: #ffffff; /* Keeps table surface white over the app background. */
-  border: 1px solid #d8d8d2; /* Adds a subtle table frame. */
-  border-radius: 8px; /* Matches other non-NES cards. */
-  overflow: hidden; /* Clips table corners to the rounded frame. */
+    background: #ffffff; /* Keeps table surface white over the app background. */
+    border: 1px solid #d8d8d2; /* Adds a subtle table frame. */
+    border-radius: 8px; /* Matches other non-NES cards. */
+    overflow: hidden; /* Clips table corners to the rounded frame. */
 }
