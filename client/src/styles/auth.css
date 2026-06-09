@@ -1,0 +1,18 @@
+/* Dialog rules are limited to the custom overlay and NES panel sizing. */
+.dialog-backdrop {
+  background: rgb(0 0 0 / 72%); /* Dims the app behind the custom login dialog. */
+  inset: 0; /* Covers the full viewport without requiring a Bootstrap modal. */
+  position: fixed; /* Keeps the dialog overlay attached to the viewport. */
+  z-index: 1000; /* Places the dialog above navbar and page content. */
+}
+
+.login-dialog {
+  background: #f8f8f2; /* Uses a NES-like light panel instead of Bootstrap modal styling. */
+  color: #15151f; /* Keeps text dark on the custom panel. */
+  max-width: 520px; /* Prevents the dialog from becoming too wide on desktop. */
+  width: 100%; /* Allows the dialog to shrink inside the padded backdrop. */
+}
+
+.auth-panel {
+  max-width: 420px; /* Keeps the standalone login form compact and readable. */
+}

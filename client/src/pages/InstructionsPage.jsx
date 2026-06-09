@@ -45,7 +45,7 @@ function InstructionsPage() {
 
   if (!instructions) {
     return (
-      <div className="page-loader">
+      <div className="page-loader d-flex align-items-center">
         <p>Loading...</p>
       </div>
     );
@@ -53,22 +53,26 @@ function InstructionsPage() {
 
   return (
     <>
-      <section className="home-page">
-        <div className="instruction-grid">
+      <section className="container-fluid py-4">
+        <div className="row row-cols-1 row-cols-md-2 row-cols-xl-5 g-3">
           {instructions.rules.map((rule, index) => (
-            <article className="nes-container is-rounded instruction-card" key={rule}>
-              <span className="instruction-number">{index + 1}</span>
-              <p>{rule}</p>
-            </article>
+            <div className="col" key={rule}>
+              <article className="nes-container is-rounded instruction-card d-grid gap-3 h-100">
+                <span className="instruction-number d-inline-flex align-items-center justify-content-center">{index + 1}</span>
+                <p className="m-0">{rule}</p>
+              </article>
+            </div>
           ))}
         </div>
-        <div className="play-row">
+        <div className="row justify-content-center pt-4">
+          <div className="col-12 col-md-4 col-xl-3">
           <button
-            className="nes-btn is-success nes-pointer play-button"
+            className="nes-btn is-success nes-pointer w-100"
             onClick={handlePlayNow}
           >
             Play now
           </button>
+          </div>
         </div>
       </section>
       <LoginDialog

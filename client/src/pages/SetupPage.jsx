@@ -50,15 +50,15 @@ function SetupPage() {
 
   if (!network) {
     return (
-      <div className="page-loader">
+      <div className="page-loader d-flex align-items-center">
         <Spinner animation="border" role="status" />
       </div>
     );
   }
 
   return (
-    <section className="setup-page">
-      <div className="page-title-row">
+    <section className="setup-page d-grid gap-4">
+      <div className="d-flex align-items-center justify-content-between gap-3">
         <h1>Setup</h1>
       </div>
       {error && <Alert variant="danger">{error}</Alert>}
@@ -67,7 +67,7 @@ function SetupPage() {
         segments={network.segments}
         stations={network.stations}
       />
-      <div className="setup-actions">
+      <div className="setup-actions d-flex justify-content-end w-100 mx-auto">
         <button
           className="nes-btn is-success nes-pointer"
           disabled={starting}

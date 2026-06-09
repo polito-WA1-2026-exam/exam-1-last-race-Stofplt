@@ -29,14 +29,14 @@ function LoginDialog({ onClose, onSuccess, open }) {
   }
 
   return (
-    <div className="dialog-backdrop" role="presentation">
+    <div className="dialog-backdrop d-flex align-items-center justify-content-center p-3" role="presentation">
       <section
         aria-labelledby="login-dialog-title"
         className="nes-container is-rounded login-dialog"
         role="dialog"
       >
-        <div className="dialog-title-row">
-          <h2 id="login-dialog-title">Login</h2>
+        <div className="d-flex align-items-center justify-content-between gap-3 mb-3">
+          <h2 className="m-0" id="login-dialog-title">Login</h2>
           <button
             aria-label="Close login dialog"
             className="nes-btn is-error nes-pointer"
@@ -47,7 +47,7 @@ function LoginDialog({ onClose, onSuccess, open }) {
           </button>
         </div>
         {error && <p className="nes-text is-error">{error}</p>}
-        <form className="login-form" onSubmit={handleSubmit}>
+        <form className="d-grid gap-3" onSubmit={handleSubmit}>
           <label htmlFor="username">Email</label>
           <input
             autoComplete="username"

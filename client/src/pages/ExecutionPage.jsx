@@ -33,8 +33,8 @@ function ExecutionPage() {
   }
 
   return (
-    <section className="execution-page">
-      <div className="page-title-row">
+    <section className="execution-page d-grid gap-4">
+      <div className="d-flex align-items-center justify-content-between gap-3">
         <h1>Execution</h1>
         {completed ? (
           <Button onClick={() => navigate(`/result/${gameId}`)}>View result</Button>
@@ -57,7 +57,7 @@ function ExecutionPage() {
           <p className="mb-0">Execute the first segment to reveal its event.</p>
         </div>
       ) : (
-        <div className="execution-list">
+        <div className="d-grid gap-3">
           {steps.map((step) => (
             <ExecutionStep key={step.index} step={step} />
           ))}

@@ -35,14 +35,14 @@ function ResultPage() {
 
   if (!result) {
     return (
-      <div className="page-loader">
+      <div className="page-loader d-flex align-items-center">
         <Spinner animation="border" role="status" />
       </div>
     );
   }
 
   return (
-    <section className="result-page">
+    <section className="result-page d-grid gap-4">
       <h1>Result</h1>
       <dl className="planning-summary">
         <div>
@@ -65,7 +65,7 @@ function ResultPage() {
 
       <section>
         <h2>Executed route</h2>
-        <div className="execution-list">
+        <div className="d-grid gap-3">
           {result.steps.map((step) => (
             <ExecutionStep key={step.index} step={step} />
           ))}

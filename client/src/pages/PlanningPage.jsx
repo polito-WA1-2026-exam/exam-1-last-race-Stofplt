@@ -226,50 +226,61 @@ function PlanningPage() {
 
   if (!network || !game) {
     return (
-      <div className="page-loader">
+      <div className="page-loader d-flex align-items-center">
         <Spinner animation="border" role="status" />
       </div>
     );
   }
 
   return (
-    <section className="planning-page">
+    <section className="planning-page container-fluid py-4">
       {error && <Alert variant="danger">{error}</Alert>}
 
       <div className="planning-board">
         <section className="planning-segments-panel">
-          <PlanningMap
-            destinationStationId={game.destinationStation.id}
-            startStationId={game.startStation.id}
-            stations={mapStations}
-          />
-          <h2>Available segments</h2>
-          <SegmentList
-            onSwitchSelected={switchSelectedDirection}
-            onToggle={toggleSegment}
-            selectedSegmentIdByPairId={selectedSegmentIdByPairId}
-            selectedPairIds={selectedPairIds}
-            segmentPairs={network.segmentPairs}
-            stations={network.stations}
-          />
+          <div className="planning-labeled-block">
+            <h2 className="planning-panel-heading m-0">Map</h2>
+            <PlanningMap
+              destinationStationId={game.destinationStation.id}
+              startStationId={game.startStation.id}
+              stations={mapStations}
+            />
+          </div>
+          <div className="planning-labeled-block">
+            <h2 className="planning-panel-heading m-0">Available segments</h2>
+            <SegmentList
+              onSwitchSelected={switchSelectedDirection}
+              onToggle={toggleSegment}
+              selectedSegmentIdByPairId={selectedSegmentIdByPairId}
+              selectedPairIds={selectedPairIds}
+              segmentPairs={network.segmentPairs}
+              stations={network.stations}
+            />
+          </div>
         </section>
 
         <aside className="planning-route-panel">
-          <div className="planning-status">
-            <div className="planning-timer nes-container is-rounded">
-              <progress
-                className={`nes-progress ${timerClass}`}
-                max="100"
-                value={timePercentage}
-              />
-              <span>{timeLeft}s</span>
+          <div className="planning-status-row">
+            <div className="planning-labeled-block planning-status-block">
+              <h2 className="planning-panel-heading m-0">Timer</h2>
+              <div className="planning-timer nes-container is-rounded d-inline-flex align-items-center gap-3">
+                <progress
+                  className={`nes-progress ${timerClass}`}
+                  max="100"
+                  value={timePercentage}
+                />
+                <span>{timeLeft}s</span>
+              </div>
             </div>
-            <div className="planning-coins nes-container is-rounded">
-              <i className="nes-icon coin is-small" aria-hidden="true" />
-              <span>20</span>
+            <div className="planning-labeled-block planning-status-block">
+              <h2 className="planning-panel-heading m-0">Coins</h2>
+              <div className="planning-coins nes-container is-rounded d-inline-flex align-items-center justify-content-center gap-2">
+                <i className="nes-icon coin is-small" aria-hidden="true" />
+                <span>20</span>
+              </div>
             </div>
           </div>
-          <h2>Selected route</h2>
+          <h2 className="planning-panel-heading m-0">Selected route</h2>
           <RouteBuilder
             onClear={clearRoute}
             onRemoveSegment={removeSelectedSegment}

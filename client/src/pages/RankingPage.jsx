@@ -32,14 +32,14 @@ function RankingPage() {
 
   if (!ranking) {
     return (
-      <div className="page-loader">
+      <div className="page-loader d-flex align-items-center">
         <Spinner animation="border" role="status" />
       </div>
     );
   }
 
   return (
-    <section className="ranking-page">
+    <section className="ranking-page d-grid gap-4">
       <h1>Ranking</h1>
       {ranking.length === 0 ? (
         <p className="text-secondary mb-0">No completed games yet.</p>

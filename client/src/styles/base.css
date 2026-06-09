@@ -1,0 +1,107 @@
+/* Global app constants used where Bootstrap utilities cannot know the navbar height. */
+html {
+    --app-content-padding: 2rem; /* Keeps the outer app spacing in one reusable value. */
+    --app-content-padding-block: 4rem; /* Lets Planning subtract top and bottom app padding from viewport height. */
+    --navbar-height: 88px; /* Matches the fixed visual height of the custom NES navbar. */
+    --nes-cursor-pointer:
+        url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAzElEQVRYR+2X0Q6AIAhF5f8/2jYXZkwEjNSVvVUjDpcrGgT7FUkI2D9xRfQETwNIiWO85wfINfQUEyxBG2ArsLwC0jioGt5zFcwF4OYDPi/mBYKm4t0U8ATgRm3ThFoAqkhNgWkA0jJLvaOVSs7j3qMnSgXWBMiWPXe94QqMBMBc1VZIvaTu5u5pQewq0EqNZvIEMCmxAawK0DNkay9QmfFNAJUXfgGgUkLaE7j/h8fnASkxHTz0DGIBMCnBeeM7AArpUd3mz2x3C7wADglA8BcWMZhZAAAAAElFTkSuQmCC)
+            14 0,
+        pointer; /* Reuses NES pointer cursor even on custom buttons. */
+}
+
+body {
+    min-height: 100vh; /* Fallback for browsers without dynamic viewport units. */
+    min-height: 100dvh; /* Uses the actually visible viewport on modern browsers. */
+    background: #e8eef8; /* Defines the page background because Bootstrap theme colors do not match the game palette. */
+    color: #171720; /* Sets the app text color to match the NES-inspired dark ink. */
+    font-family:
+        "Press Start 2P", system-ui, sans-serif; /* Applies the project font globally instead of repeating it per component. */
+}
+
+main {
+    min-height: calc(
+        100vh - var(--navbar-height)
+    ); /* Keeps the routed content at least below-navbar height in older browsers. */
+    min-height: calc(
+        100dvh - var(--navbar-height)
+    ); /* Keeps routed content aligned to visible viewport height. */
+}
+
+button,
+input {
+    font-family: inherit; /* Forces native form controls to use the pixel font consistently. */
+}
+
+button.nes-btn.nes-pointer,
+button.nes-btn.nes-pointer:hover,
+button.nes-btn.nes-pointer:focus,
+button.nes-btn.nes-pointer:active {
+    cursor: var(
+        --nes-cursor-pointer
+    ) !important; /* Overrides NES/Bootstrap cursor conflicts for clickable controls. */
+}
+
+.nes-container.is-rounded {
+    border-image-repeat: stretch; /* Prevents segmented NES borders caused by browser-specific NES.css defaults. */
+}
+
+.nes-btn {
+    border-image-repeat: stretch; /* Prevents segmented NES borders caused by browser-specific NES.css defaults. */
+}
+
+.app-content {
+    box-sizing: border-box; /* Includes padding in viewport-height calculations. */
+    min-height: calc(
+        100vh - var(--navbar-height)
+    ); /* Gives pages the remaining viewport height below the navbar. */
+    min-height: calc(
+        100dvh - var(--navbar-height)
+    ); /* Uses visible viewport height when supported. */
+    padding: var(
+        --app-content-padding
+    ); /* Centralizes page padding rather than repeating Bootstrap spacing everywhere. */
+}
+
+.page-loader {
+    min-height: 220px; /* Prevents loading states from collapsing into tiny rows. */
+}
+
+/* Navbar colors and sizes are custom because Bootstrap navbars do not match the NES game header. */
+.app-navbar {
+    background: #181825; /* Provides the dark game header background. */
+    border-bottom: 4px solid #171720; /* Adds the pixel-thick separation from page content. */
+    min-height: var(
+        --navbar-height
+    ); /* Keeps content height calculations synchronized with the visual navbar. */
+}
+
+.brand-link,
+.nav-link-pixel {
+    color: #ffffff; /* Keeps nav links white on the dark custom navbar. */
+}
+
+.brand-link {
+    font-size: 1.15rem; /* Makes the game title larger than secondary nav links. */
+}
+
+.brand-link:hover,
+.nav-link-pixel:hover {
+    color: #facc15; /* Matches the yellow player/name accent on hover. */
+}
+
+.user-name {
+    color: #facc15; /* Highlights the logged-in player with the same yellow accent. */
+    font-size: 0.8rem; /* Keeps the player name compact inside the navbar. */
+}
+
+.logout-button {
+    height: 42px; /* Gives the icon button a stable NES-sized square hit area. */
+    padding: 0.35rem; /* Centers the inline SVG without relying on default NES padding. */
+    width: 42px; /* Matches height so the logout button remains square. */
+}
+
+.logout-button svg {
+    fill: currentColor; /* Lets the SVG inherit NES button foreground color. */
+    height: 22px; /* Keeps the icon visually centered inside the 42px button. */
+    width: 22px; /* Keeps the icon square and balanced. */
+}

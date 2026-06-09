@@ -15,14 +15,14 @@ function AppNavbar() {
 
   return (
     <>
-      <header className="app-navbar">
-        <Link className="brand-link nes-pointer" to="/">
+      <header className="app-navbar d-flex align-items-center gap-3 px-4 py-3">
+        <Link className="brand-link nes-pointer text-decoration-none" to="/">
           Last Race
         </Link>
-        <nav className="main-nav">
-          <Link className="nes-pointer" to="/ranking">Ranking</Link>
+        <nav className="d-flex align-items-center gap-3 flex-grow-1">
+          <Link className="nav-link-pixel nes-pointer text-decoration-none" to="/ranking">Ranking</Link>
         </nav>
-        <div className="session-actions">
+        <div className="d-flex align-items-center gap-2">
           {loggedIn ? (
             <>
               <span className="user-name">{user.name}</span>

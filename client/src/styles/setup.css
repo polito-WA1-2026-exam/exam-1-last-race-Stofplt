@@ -1,0 +1,121 @@
+/* Setup metro map needs custom SVG animation and pixel styling. */
+.metro-map-panel {
+  --metro-bg: #1f1f1f; /* Defines the setup map dark background. */
+  --metro-grid: rgb(255 255 255 / 4%); /* Defines subtle map grid lines. */
+  --metro-shadow-opacity: 0.45; /* Keeps animated line shadows consistent. */
+  --metro-text: #f7f7f2; /* Defines map label color. */
+  aspect-ratio: 7 / 5; /* Preserves the setup map proportion. */
+  background: linear-gradient(var(--metro-grid) 1px, transparent 1px), linear-gradient(90deg, var(--metro-grid) 1px, transparent 1px), var(--metro-bg); /* Draws the pixel grid over the map background. */
+  background-size: 8px 8px; /* Matches the pixel-grid scale. */
+  border: 4px solid #171720; /* Frames the SVG without relying on NES container markup. */
+  box-shadow: 8px 8px 0 #111119; /* Adds the heavy pixel shadow used by setup. */
+  height: min(64vh, 580px); /* Keeps the setup map large but bounded. */
+  margin-inline: auto; /* Centers the setup map. */
+  max-width: 1080px; /* Prevents over-wide map stretching. */
+  min-height: 460px; /* Keeps labels readable on desktop. */
+  overflow: hidden; /* Clips animated SVG pixels inside the frame. */
+  width: 100%; /* Lets the map fill the available setup width. */
+}
+
+.setup-actions {
+  max-width: 1080px; /* Aligns the Start button row with the setup map width. */
+}
+
+.source-line {
+  fill: none; /* Ensures hidden source paths do not render filled shapes. */
+  stroke-linecap: round; /* Keeps sampled path geometry smooth for SVG length APIs. */
+  stroke-linejoin: round; /* Keeps sampled path geometry smooth for SVG length APIs. */
+  stroke-width: 8px; /* Matches the intended metro line thickness for sampling. */
+  visibility: hidden; /* Keeps source paths available to JS but invisible to users. */
+}
+
+.pixel-lines {
+  pointer-events: none; /* Prevents animated line pixels from blocking station hover. */
+}
+
+.map-annotations {
+  pointer-events: auto; /* Allows station markers to receive hover/focus. */
+}
+
+.metro-pixel,
+.metro-pixel-shadow {
+  opacity: 0; /* Starts animated pixels hidden before reveal. */
+  shape-rendering: crispEdges; /* Keeps generated pixel rectangles sharp. */
+}
+
+.metro-pixel {
+  stroke: rgb(0 0 0 / 55%); /* Adds a small dark outline to colored pixels. */
+  stroke-width: 0.35px; /* Keeps the outline subtle at SVG scale. */
+}
+
+.metro-pixel-shadow.is-visible {
+  opacity: var(--metro-shadow-opacity); /* Reveals shadow pixels during animation. */
+}
+
+.metro-pixel.is-visible {
+  opacity: 1; /* Reveals colored pixels during animation. */
+}
+
+.station-marker {
+  opacity: 0; /* Keeps stations hidden until their line animation reaches them. */
+  outline: none; /* Avoids browser outline conflicting with SVG marker styling. */
+  transition: opacity 180ms steps(3, end); /* Reveals stations with a pixel-like step animation. */
+}
+
+.station,
+.interchange {
+  fill: var(--metro-text); /* Uses light fill for visible station markers. */
+  pointer-events: auto; /* Lets markers receive hover/focus. */
+  shape-rendering: crispEdges; /* Keeps station squares pixel-sharp. */
+  transform: scale(0.2); /* Starts markers tiny before reveal. */
+  transform-box: fill-box; /* Scales SVG markers around their own box. */
+  transform-origin: center; /* Grows markers from the center. */
+  transition: transform 140ms ease-out; /* Smooths marker reveal and hover. */
+}
+
+.station {
+  stroke-width: 2.5px; /* Keeps ordinary station outline consistent. */
+}
+
+.interchange {
+  fill: var(--metro-bg); /* Makes interchange markers hollow against map background. */
+  stroke: var(--metro-text); /* Outlines interchange markers in light text color. */
+  stroke-width: 3px; /* Makes interchange markers stand out. */
+}
+
+.label {
+  fill: var(--metro-text); /* Uses the setup map label color. */
+  font-family: "Press Start 2P", "Courier New", monospace; /* Keeps SVG labels in the app font. */
+  font-size: 7px; /* Matches the original setup map label density. */
+  letter-spacing: 0; /* Prevents pixel font distortion. */
+  paint-order: stroke fill; /* Draws dark halo behind labels. */
+  pointer-events: none; /* Keeps label text from blocking station hover. */
+  stroke: rgb(31 31 31 / 75%); /* Gives labels readable dark outline. */
+  stroke-width: 2.5px; /* Matches Planning map label outline. */
+  transform: translateX(0); /* Provides a stable transform base for hover scale. */
+  transform-box: fill-box; /* Scales labels from their own bounding box. */
+  transform-origin: left center; /* Keeps label hover expansion anchored near the station. */
+  transition: transform 140ms ease-out; /* Smooths label hover scaling. */
+  user-select: none; /* Prevents accidental label selection. */
+}
+
+.station-marker.is-visible {
+  opacity: 1; /* Shows station groups once animation reaches them. */
+}
+
+.station-marker.is-visible .station,
+.station-marker.is-visible .interchange {
+  transform: scale(1); /* Restores markers to full size after reveal. */
+}
+
+.station-marker.is-visible:hover .station,
+.station-marker.is-visible:focus .station,
+.station-marker.is-visible:hover .interchange,
+.station-marker.is-visible:focus .interchange {
+  transform: scale(2.4); /* Emphasizes hovered station marker. */
+}
+
+.station-marker.is-visible:hover .label,
+.station-marker.is-visible:focus .label {
+  transform: scale(1.8); /* Emphasizes hovered station label. */
+}

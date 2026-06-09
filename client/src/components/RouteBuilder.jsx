@@ -20,7 +20,7 @@ function RouteBuilder({
         <ol className="route-steps">
           {segments.map((segment, index) => (
             <li
-              className="route-step-item nes-container is-rounded"
+              className="route-step-item nes-container is-rounded d-grid align-items-center"
               key={`${segment.id}-${index}`}
             >
               <span className="route-step-index">{index + 1}</span>
@@ -45,7 +45,7 @@ function RouteBuilder({
           ))}
         </ol>
       )}
-      <div className="route-actions">
+      <div className="d-grid gap-3 route-actions">
         <button
           className="nes-btn is-error nes-pointer"
           disabled={segments.length === 0 || submitting}

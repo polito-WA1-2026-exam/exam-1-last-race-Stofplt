@@ -1,0 +1,44 @@
+/* Small result/execution/ranking styles that remain more concise than repeated JSX classes. */
+.execution-step {
+  background: #ffffff; /* Matches the app's light panel color. */
+  border: 1px solid #d8d8d2; /* Adds a subtle separator without a full NES container. */
+  border-radius: 8px; /* Keeps execution cards compact and readable. */
+  padding: 0.9rem; /* Gives execution details readable spacing. */
+}
+
+.planning-summary {
+  background: #ffffff; /* Gives result summary a simple white panel. */
+  border: 1px solid #d8d8d2; /* Separates the summary from the page background. */
+  border-radius: 8px; /* Matches execution card rounding. */
+  display: grid; /* Stacks key/value rows. */
+}
+
+.planning-summary div {
+  display: grid; /* Aligns result labels and values in columns. */
+  gap: 1rem; /* Separates label and value. */
+  grid-template-columns: 8rem 1fr; /* Keeps result labels aligned. */
+  padding: 0.75rem 1rem; /* Gives each summary row comfortable spacing. */
+}
+
+.planning-summary div + div {
+  border-top: 1px solid #eeeeea; /* Separates summary rows. */
+}
+
+.planning-summary dt {
+  color: #66665f; /* Makes summary labels secondary. */
+}
+
+.planning-summary dd {
+  margin: 0; /* Removes default definition-list margin. */
+}
+
+.ranking-page {
+  max-width: 760px; /* Keeps the ranking table readable on wide screens. */
+}
+
+.ranking-table {
+  background: #ffffff; /* Keeps table surface white over the app background. */
+  border: 1px solid #d8d8d2; /* Adds a subtle table frame. */
+  border-radius: 8px; /* Matches other non-NES cards. */
+  overflow: hidden; /* Clips table corners to the rounded frame. */
+}

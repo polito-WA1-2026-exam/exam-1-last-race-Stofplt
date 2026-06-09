@@ -6,24 +6,24 @@ function ExecutionStep({ step }) {
   const effect = step.event?.effect;
 
   return (
-    <article className="execution-step">
-      <div className="execution-step-header">
+    <article className="execution-step d-grid gap-2">
+      <div className="d-flex align-items-center justify-content-between gap-2 text-secondary">
         <span>Step {step.index}</span>
         <span>{step.line}</span>
       </div>
-      <div className="execution-route">
+      <div className="d-flex align-items-center gap-2 fw-semibold">
         <span>{step.fromStation}</span>
         <span aria-hidden="true">{"->"}</span>
         <span>{step.toStation}</span>
       </div>
-      <div className="execution-event">
+      <div className="d-flex align-items-center justify-content-between gap-2">
         <span>{step.event?.description ?? "Pending event"}</span>
         {effect !== undefined && (
           <strong>{effect > 0 ? `+${effect}` : effect}</strong>
         )}
       </div>
       {step.coins !== null && (
-        <div className="execution-coins">Coins: {step.coins}</div>
+        <div className="text-body-secondary">Coins: {step.coins}</div>
       )}
     </article>
   );

@@ -1,0 +1,17 @@
+.instruction-card {
+  background: #fffdf2; /* Uses the warm NES panel color instead of Bootstrap cards. */
+  color: #171720; /* Keeps text readable on the warm panel. */
+  min-height: 250px; /* Makes the five rule cards visually even. */
+}
+
+.instruction-card p {
+  font-size: clamp(0.65rem, 0.9vw, 0.85rem); /* Keeps long rule text fitting across desktop widths. */
+  line-height: 1.8; /* Improves readability for the pixel font. */
+}
+
+.instruction-number {
+  background: #2563eb; /* Provides a simple blue badge distinct from NES button colors. */
+  color: #ffffff; /* Keeps the number readable on the blue badge. */
+  height: 2rem; /* Gives every number badge a stable square shape. */
+  width: 2rem; /* Matches the badge height for a square pixel marker. */
+}
