@@ -101,7 +101,7 @@ erDiagram
 - The metro network is static and stored server-side.
 - A station belongs to a line when it appears in at least one segment of that line.
 - Interchange stations are derived from stations appearing in segments belonging to more than one line.
-- The `segments.path` value stores the SVG path used by the setup map. The two directed segments representing the same physical connection share the same path.
+- The `segments.path` value stores the SVG path for that directed segment. Opposite segments follow the same physical connection but store the path in opposite drawing order, so execution animations can follow the selected travel direction.
 - Route validation uses consecutive directed `segments` and allows line changes only at interchange stations.
 - Every game starts from 20 coins by rule, so the initial value is not stored in the database.
 - Intermediate coin totals are derived from the initial 20 coins and the events applied to executed steps.
