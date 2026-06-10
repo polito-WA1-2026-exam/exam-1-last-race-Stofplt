@@ -54,9 +54,11 @@ async function submitRoute(gameId, segments) {
   });
 }
 
-async function executeNextStep(gameId) {
+async function executeNextStep(gameId, expectedStepIndex) {
   return await requestJson(`/games/${gameId}/execute/next`, {
     method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ expectedStepIndex }),
   });
 }
 

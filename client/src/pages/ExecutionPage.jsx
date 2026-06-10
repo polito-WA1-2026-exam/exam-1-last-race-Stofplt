@@ -64,7 +64,7 @@ function ExecutionPage() {
     executingRef.current = true;
 
     try {
-      const result = await executeNextStep(gameId);
+      const result = await executeNextStep(gameId, executedPaths.length + 1);
 
       setCoins(result.step.coins);
       setLastEvent(result.step.event);

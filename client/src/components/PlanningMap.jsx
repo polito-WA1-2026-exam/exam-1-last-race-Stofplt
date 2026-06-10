@@ -1,33 +1,11 @@
-const STATION_SIZE = 8;
+import {
+  LABEL_LOWER_Y,
+  LABEL_OFFSET_X,
+  STATION_SIZE,
+  getLabelOffsetByStation,
+} from "./mapUtils.js";
+
 const HIGHLIGHT_SIZE = 14;
-const LABEL_OFFSET_X = 10;
-const LABEL_RAISE_Y = -11;
-const LABEL_LOWER_Y = 11;
-
-function getLabelOffsetByStation(stations) {
-  const stationsByY = new Map();
-
-  stations.forEach((station) => {
-    const row = stationsByY.get(station.y) ?? [];
-    row.push(station);
-    stationsByY.set(station.y, row);
-  });
-
-  const offsetByStation = new Map();
-
-  stationsByY.forEach((row) => {
-    row
-      .sort((first, second) => first.x - second.x)
-      .forEach((station, index) => {
-        offsetByStation.set(
-          station.id,
-          index % 2 === 0 ? LABEL_LOWER_Y : LABEL_RAISE_Y,
-        );
-      });
-  });
-
-  return offsetByStation;
-}
 
 function PlanningMap({ destinationStationId, startStationId, stations = [] }) {
   const labelOffsetByStation = getLabelOffsetByStation(stations);

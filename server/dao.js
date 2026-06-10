@@ -10,6 +10,7 @@ if (!fs.existsSync("db.sqlite")) {
 
 const db = new sqlite3.Database("db.sqlite");
 const scrypt = promisify(crypto.scrypt);
+let writeQueue = Promise.resolve();
 
 function get(sql, params = []) {
   return new Promise((resolve, reject) => {
@@ -36,6 +37,23 @@ function run(sql, params = []) {
       else resolve(this);
     });
   });
+}
+
+async function withWriteLock(operation) {
+  const previousOperation = writeQueue;
+  let releaseLock;
+
+  writeQueue = new Promise((resolve) => {
+    releaseLock = resolve;
+  });
+
+  await previousOperation.catch(() => {});
+
+  try {
+    return await operation();
+  } finally {
+    releaseLock();
+  }
 }
 
 function toPublicUser(row) {
@@ -148,21 +166,23 @@ async function getPlanningSegmentPairs() {
 }
 
 async function createGame(userId, startStationId, destinationStationId) {
-  const result = await run(
-    `INSERT INTO games (
-       user_id,
-       start_station_id,
-       destination_station_id,
-       status,
-       final_score,
-       created_at,
-       completed_at
-     )
-     VALUES (?, ?, ?, 'planning', NULL, ?, NULL)`,
-    [userId, startStationId, destinationStationId, new Date().toISOString()],
-  );
+  return await withWriteLock(async () => {
+    const result = await run(
+      `INSERT INTO games (
+         user_id,
+         start_station_id,
+         destination_station_id,
+         status,
+         final_score,
+         created_at,
+         completed_at
+       )
+       VALUES (?, ?, ?, 'planning', NULL, ?, NULL)`,
+      [userId, startStationId, destinationStationId, new Date().toISOString()],
+    );
 
-  return result.lastID;
+    return result.lastID;
+  });
 }
 
 async function getGameForUser(gameId, userId) {
@@ -241,59 +261,49 @@ async function getInterchangeStationIds() {
 }
 
 async function savePlannedRoute(gameId, segmentIds) {
-  await run("BEGIN TRANSACTION");
+  return await withWriteLock(async () => {
+    await run("BEGIN IMMEDIATE TRANSACTION");
 
-  try {
-    await run("DELETE FROM game_steps WHERE game_id = ?", [gameId]);
-
-    for (let i = 0; i < segmentIds.length; i++) {
-      await run(
-        `INSERT INTO game_steps (game_id, step_index, segment_id, event_id)
-         VALUES (?, ?, ?, NULL)`,
-        [gameId, i + 1, segmentIds[i]],
+    try {
+      const statusUpdate = await run(
+        "UPDATE games SET status = 'executing' WHERE id = ? AND status = 'planning'",
+        [gameId],
       );
-    }
 
-    await run("UPDATE games SET status = 'executing' WHERE id = ?", [gameId]);
-    await run("COMMIT");
-  } catch (err) {
-    await run("ROLLBACK");
-    throw err;
-  }
+      if (statusUpdate.changes === 0) {
+        await run("ROLLBACK");
+        return false;
+      }
+
+      await run("DELETE FROM game_steps WHERE game_id = ?", [gameId]);
+
+      for (let i = 0; i < segmentIds.length; i++) {
+        await run(
+          `INSERT INTO game_steps (game_id, step_index, segment_id, event_id)
+           VALUES (?, ?, ?, NULL)`,
+          [gameId, i + 1, segmentIds[i]],
+        );
+      }
+
+      await run("COMMIT");
+      return true;
+    } catch (err) {
+      await run("ROLLBACK");
+      throw err;
+    }
+  });
 }
 
 async function failGame(gameId) {
-  await run(
-    `UPDATE games
-     SET status = 'failed',
-         final_score = 0,
-         completed_at = ?
-     WHERE id = ?`,
-    [new Date().toISOString(), gameId],
-  );
-}
-
-async function getNextStep(gameId) {
-  return await get(
-    `SELECT gs.game_id,
-            gs.step_index,
-            gs.segment_id,
-            s.from_station_id,
-            fs.name AS from_station_name,
-            s.to_station_id,
-            ts.name AS to_station_name,
-            s.line_id,
-            s.path,
-            l.name AS line_name
-     FROM game_steps gs
-     JOIN segments s ON s.id = gs.segment_id
-     JOIN stations fs ON fs.id = s.from_station_id
-     JOIN stations ts ON ts.id = s.to_station_id
-     JOIN lines l ON l.id = s.line_id
-     WHERE gs.game_id = ? AND gs.event_id IS NULL
-     ORDER BY gs.step_index
-     LIMIT 1`,
-    [gameId],
+  await withWriteLock(() =>
+    run(
+      `UPDATE games
+       SET status = 'failed',
+           final_score = 0,
+           completed_at = ?
+       WHERE id = ? AND status = 'planning'`,
+      [new Date().toISOString(), gameId],
+    ),
   );
 }
 
@@ -318,35 +328,77 @@ async function getCurrentCoins(gameId) {
   return row.coins;
 }
 
-async function applyEventToStep(gameId, stepIndex, eventId) {
-  await run(
-    `UPDATE game_steps
-     SET event_id = ?
-     WHERE game_id = ? AND step_index = ?`,
-    [eventId, gameId, stepIndex],
-  );
-}
+async function executeNextPendingStep(gameId, expectedStepIndex) {
+  return await withWriteLock(async () => {
+    await run("BEGIN IMMEDIATE TRANSACTION");
 
-async function hasPendingSteps(gameId) {
-  const row = await get(
-    `SELECT COUNT(*) AS count
-     FROM game_steps
-     WHERE game_id = ? AND event_id IS NULL`,
-    [gameId],
-  );
+    try {
+      const step = await get(
+        `SELECT gs.game_id,
+                gs.step_index,
+                gs.segment_id,
+                s.line_id,
+                s.path
+         FROM game_steps gs
+         JOIN segments s ON s.id = gs.segment_id
+         WHERE gs.game_id = ? AND gs.step_index = ? AND gs.event_id IS NULL
+         LIMIT 1`,
+        [gameId, expectedStepIndex],
+      );
 
-  return row.count > 0;
-}
+      if (!step) {
+        await run("ROLLBACK");
+        return null;
+      }
 
-async function completeGame(gameId, finalScore) {
-  await run(
-    `UPDATE games
-     SET status = 'completed',
-         final_score = ?,
-         completed_at = ?
-     WHERE id = ?`,
-    [Math.max(0, finalScore), new Date().toISOString(), gameId],
-  );
+      const currentCoins = await getCurrentCoins(gameId);
+      const event = await getRandomEvent();
+      const updatedCoins = currentCoins + event.effect;
+      const stepUpdate = await run(
+        `UPDATE game_steps
+         SET event_id = ?
+         WHERE game_id = ? AND step_index = ? AND event_id IS NULL`,
+        [event.id, gameId, step.step_index],
+      );
+
+      if (stepUpdate.changes === 0) {
+        await run("ROLLBACK");
+        return null;
+      }
+
+      const pending = await get(
+        `SELECT COUNT(*) AS count
+         FROM game_steps
+         WHERE game_id = ? AND event_id IS NULL`,
+        [gameId],
+      );
+      const completed = pending.count === 0;
+
+      if (completed) {
+        await run(
+          `UPDATE games
+           SET status = 'completed',
+               final_score = ?,
+               completed_at = ?
+           WHERE id = ? AND status = 'executing'`,
+          [Math.max(0, updatedCoins), new Date().toISOString(), gameId],
+        );
+      }
+
+      await run("COMMIT");
+
+      return {
+        completed,
+        score: completed ? Math.max(0, updatedCoins) : undefined,
+        step,
+        event,
+        coins: updatedCoins,
+      };
+    } catch (err) {
+      await run("ROLLBACK");
+      throw err;
+    }
+  });
 }
 
 async function getGameResult(gameId, userId) {
@@ -420,12 +472,9 @@ export {
   getInterchangeStationIds,
   savePlannedRoute,
   failGame,
-  getNextStep,
   getRandomEvent,
   getCurrentCoins,
-  applyEventToStep,
-  hasPendingSteps,
-  completeGame,
+  executeNextPendingStep,
   getGameResult,
   getExecutedSteps,
   getRanking,

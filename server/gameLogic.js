@@ -161,10 +161,6 @@ function hasPlanningTimeExpired(startedAt, now = Date.now()) {
   return !startedAt || now - startedAt > PLANNING_TIME_LIMIT_MS;
 }
 
-function applyEventEffect(currentCoins, event) {
-  return currentCoins + event.effect;
-}
-
 function buildResultPayload(game, steps) {
   let coins = 20;
 
@@ -210,6 +206,5 @@ export {
   buildGameStartPayload,
   validateRoute,
   hasPlanningTimeExpired,
-  applyEventEffect,
   buildResultPayload,
 };

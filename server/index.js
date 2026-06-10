@@ -4,9 +4,8 @@ import session from "express-session";
 import passport from "passport";
 import { configurePassport, isLoggedIn } from "./auth.js";
 import {
-  applyEventToStep,
-  completeGame,
   createGame,
+  executeNextPendingStep,
   failGame,
   getCurrentCoins,
   getExecutedSteps,
@@ -14,19 +13,15 @@ import {
   getGameResult,
   getInterchangeStationIds,
   getLines,
-  getNextStep,
   getPlanningGame,
   getPlanningSegmentPairs,
   getRanking,
-  getRandomEvent,
   getSegments,
   getSegmentsByIds,
   getStations,
-  hasPendingSteps,
   savePlannedRoute,
 } from "./dao.js";
 import {
-  applyEventEffect,
   buildGameStartPayload,
   buildResultPayload,
   hasPlanningTimeExpired,
@@ -293,7 +288,12 @@ app.post("/api/games/:id/route", isLoggedIn, async (req, res, next) => {
       });
     }
 
-    await savePlannedRoute(gameId, req.body.segments);
+    const saved = await savePlannedRoute(gameId, req.body.segments);
+    if (!saved) {
+      return res
+        .status(409)
+        .json({ error: "The game is not accepting a route" });
+    }
     delete req.session.gameStartTimes?.[gameId];
 
     res.json({
@@ -309,9 +309,15 @@ app.post("/api/games/:id/route", isLoggedIn, async (req, res, next) => {
 app.post("/api/games/:id/execute/next", isLoggedIn, async (req, res, next) => {
   try {
     const gameId = Number(req.params.id);
+    const expectedStepIndex = req.body?.expectedStepIndex;
 
     if (!Number.isInteger(gameId) || gameId <= 0) {
       return res.status(422).json({ error: "Invalid game id" });
+    }
+    if (!Number.isInteger(expectedStepIndex) || expectedStepIndex <= 0) {
+      return res
+        .status(422)
+        .json({ error: "expectedStepIndex must be valid" });
     }
 
     const game = await getGameForUser(gameId, req.user.id);
@@ -325,39 +331,25 @@ app.post("/api/games/:id/execute/next", isLoggedIn, async (req, res, next) => {
         .json({ error: "The game is not ready for execution" });
     }
 
-    const step = await getNextStep(gameId);
+    const execution = await executeNextPendingStep(gameId, expectedStepIndex);
 
-    if (!step) {
-      return res.status(409).json({ error: "No pending steps to execute" });
-    }
-
-    const [currentCoins, event] = await Promise.all([
-      getCurrentCoins(gameId),
-      getRandomEvent(),
-    ]);
-    const updatedCoins = applyEventEffect(currentCoins, event);
-
-    await applyEventToStep(gameId, step.step_index, event.id);
-
-    const completed = !(await hasPendingSteps(gameId));
-
-    if (completed) {
-      await completeGame(gameId, updatedCoins);
+    if (!execution) {
+      return res.status(409).json({ error: "Step is not available" });
     }
 
     res.json({
-      completed,
-      score: completed ? Math.max(0, updatedCoins) : undefined,
+      completed: execution.completed,
+      score: execution.score,
       step: {
-        index: step.step_index,
-        segmentId: step.segment_id,
-        lineId: step.line_id,
-        path: step.path,
+        index: execution.step.step_index,
+        segmentId: execution.step.segment_id,
+        lineId: execution.step.line_id,
+        path: execution.step.path,
         event: {
-          description: event.description,
-          effect: event.effect,
+          description: execution.event.description,
+          effect: execution.event.effect,
         },
-        coins: updatedCoins,
+        coins: execution.coins,
       },
     });
   } catch (err) {
