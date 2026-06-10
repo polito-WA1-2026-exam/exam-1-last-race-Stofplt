@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Alert, Button, Form } from "react-bootstrap";
 import { Navigate, useLocation, useNavigate } from "react-router";
 import { useUser } from "../contexts/UserContext.js";
 
@@ -32,34 +31,44 @@ function LoginPage() {
   }
 
   return (
-    <section className="auth-panel">
-      <h1>Login</h1>
-      {error && <Alert variant="danger">{error}</Alert>}
-      <Form onSubmit={handleSubmit}>
-        <Form.Group className="mb-3" controlId="username">
-          <Form.Label>Email</Form.Label>
-          <Form.Control
-            autoComplete="username"
-            onChange={(event) => setUsername(event.target.value)}
-            required
-            type="email"
-            value={username}
-          />
-        </Form.Group>
-        <Form.Group className="mb-4" controlId="password">
-          <Form.Label>Password</Form.Label>
-          <Form.Control
-            autoComplete="current-password"
-            onChange={(event) => setPassword(event.target.value)}
-            required
-            type="password"
-            value={password}
-          />
-        </Form.Group>
-        <Button disabled={submitting} type="submit">
-          {submitting ? "Logging in..." : "Login"}
-        </Button>
-      </Form>
+    <section className="login-dialog nes-container is-rounded mx-auto mt-5">
+      <h2 className="m-0 mb-2">Login</h2>
+      {error && <p className="nes-text is-error">{error}</p>}
+      <form className="d-grid gap-3" onSubmit={handleSubmit}>
+        <label className="m-0" htmlFor="username">
+          Email
+        </label>
+        <input
+          autoComplete="username"
+          className="nes-input mb-3"
+          id="username"
+          onChange={(event) => setUsername(event.target.value)}
+          required
+          type="email"
+          value={username}
+        />
+
+        <label className="m-0" htmlFor="password">
+          Password
+        </label>
+        <input
+          autoComplete="current-password"
+          className="nes-input mb-3"
+          id="password"
+          onChange={(event) => setPassword(event.target.value)}
+          required
+          type="password"
+          value={password}
+        />
+
+        <button
+          className="nes-btn is-primary nes-pointer mx-auto w-50"
+          disabled={submitting}
+          type="submit"
+        >
+          {submitting ? "Logging in..." : "Enter"}
+        </button>
+      </form>
     </section>
   );
 }

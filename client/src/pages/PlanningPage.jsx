@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Alert, Spinner } from "react-bootstrap";
+import { Spinner } from "react-bootstrap";
 import { useLocation, useNavigate, useParams } from "react-router";
 import {
   getNetworkStations,
@@ -21,7 +21,6 @@ function PlanningPage() {
   const [mapStations, setMapStations] = useState([]);
   const [network, setNetwork] = useState(null);
   const [selectedSegmentIds, setSelectedSegmentIds] = useState([]);
-  const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [timeLeft, setTimeLeft] = useState(PLANNING_SECONDS);
   const selectedSegmentIdsRef = useRef([]);
@@ -118,16 +117,16 @@ function PlanningPage() {
           setGame(gameData);
         }
       })
-      .catch((err) => {
+      .catch(() => {
         if (active) {
-          setError(err.message);
+          navigate("/", { replace: true });
         }
       });
 
     return () => {
       active = false;
     };
-  }, [gameId]);
+  }, [gameId, navigate]);
 
   const submitSelectedRoute = useCallback(
     async (segmentIds = selectedSegmentIdsRef.current) => {
@@ -135,7 +134,6 @@ function PlanningPage() {
         return;
       }
 
-      setError("");
       setSubmitting(true);
       submittingRef.current = true;
 
@@ -143,13 +141,13 @@ function PlanningPage() {
         const result = await submitRoute(Number(gameId), segmentIds);
 
         if (!result.valid) {
-          setError(result.reason || "The route is not valid");
+          navigate(`/result/${gameId}`, { replace: true });
           return;
         }
 
         navigate(`/execution/${gameId}`);
-      } catch (err) {
-        setError(err.message);
+      } catch {
+        navigate("/", { replace: true });
       } finally {
         setSubmitting(false);
         submittingRef.current = false;
@@ -222,10 +220,6 @@ function PlanningPage() {
     setSelectedSegmentIds([]);
   }
 
-  if (error && (!network || !game)) {
-    return <Alert variant="danger">{error}</Alert>;
-  }
-
   if (!network || !game) {
     return (
       <div className="page-loader d-flex align-items-center">
@@ -239,8 +233,6 @@ function PlanningPage() {
       <div className="d-flex align-items-center justify-content-between gap-3 mb-3">
         <h1>Planning</h1>
       </div>
-
-      {error && <Alert variant="danger">{error}</Alert>}
 
       <div className="planning-board">
         <section className="planning-segments-panel">

@@ -29,14 +29,19 @@ function LoginDialog({ onClose, onSuccess, open }) {
   }
 
   return (
-    <div className="dialog-backdrop d-flex align-items-center justify-content-center p-3" role="presentation">
+    <div
+      className="dialog-backdrop d-flex align-items-center justify-content-center p-3"
+      role="presentation"
+    >
       <section
         aria-labelledby="login-dialog-title"
         className="nes-container is-rounded login-dialog"
         role="dialog"
       >
-        <div className="d-flex align-items-center justify-content-between gap-3 mb-3">
-          <h2 className="m-0" id="login-dialog-title">Login</h2>
+        <div className="d-flex align-items-center justify-content-between gap-3 mb-4">
+          <h2 className="m-0" id="login-dialog-title">
+            Login
+          </h2>
           <button
             aria-label="Close login dialog"
             className="nes-btn is-error nes-pointer"
@@ -48,10 +53,12 @@ function LoginDialog({ onClose, onSuccess, open }) {
         </div>
         {error && <p className="nes-text is-error">{error}</p>}
         <form className="d-grid gap-3" onSubmit={handleSubmit}>
-          <label htmlFor="username">Email</label>
+          <label className="m-0" htmlFor="username">
+            Email
+          </label>
           <input
             autoComplete="username"
-            className="nes-input"
+            className="nes-input mb-3"
             id="username"
             onChange={(event) => setUsername(event.target.value)}
             required
@@ -59,10 +66,12 @@ function LoginDialog({ onClose, onSuccess, open }) {
             value={username}
           />
 
-          <label htmlFor="password">Password</label>
+          <label className="m-0" htmlFor="password">
+            Password
+          </label>
           <input
             autoComplete="current-password"
-            className="nes-input"
+            className="nes-input mb-3"
             id="password"
             onChange={(event) => setPassword(event.target.value)}
             required
@@ -71,7 +80,7 @@ function LoginDialog({ onClose, onSuccess, open }) {
           />
 
           <button
-            className="nes-btn is-primary nes-pointer"
+            className="nes-btn is-primary nes-pointer mx-auto w-50"
             disabled={submitting}
             type="submit"
           >

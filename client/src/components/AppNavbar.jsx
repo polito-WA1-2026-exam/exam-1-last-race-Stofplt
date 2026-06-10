@@ -20,7 +20,12 @@ function AppNavbar() {
           Last Race
         </Link>
         <nav className="d-flex align-items-center gap-3 flex-grow-1">
-          <Link className="nav-link-pixel nes-pointer text-decoration-none" to="/ranking">Ranking</Link>
+          <Link
+            className="nav-link-pixel nes-pointer text-decoration-none"
+            to="/ranking"
+          >
+            Ranking
+          </Link>
         </nav>
         <div className="d-flex align-items-center gap-2">
           {loggedIn ? (

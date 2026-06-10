@@ -1,24 +1,8 @@
-const MAP_PADDING = 60;
 const STATION_SIZE = 8;
 const HIGHLIGHT_SIZE = 14;
 const LABEL_OFFSET_X = 10;
 const LABEL_RAISE_Y = -11;
 const LABEL_LOWER_Y = 11;
-
-function buildViewBox(stations) {
-  if (stations.length === 0) {
-    return "0 0 800 600";
-  }
-
-  const xs = stations.map((station) => station.x);
-  const ys = stations.map((station) => station.y);
-  const minX = Math.min(...xs) - MAP_PADDING;
-  const minY = Math.min(...ys) - MAP_PADDING;
-  const maxX = Math.max(...xs) + MAP_PADDING;
-  const maxY = Math.max(...ys) + MAP_PADDING;
-
-  return `${minX} ${minY} ${maxX - minX} ${maxY - minY}`;
-}
 
 function getLabelOffsetByStation(stations) {
   const stationsByY = new Map();
