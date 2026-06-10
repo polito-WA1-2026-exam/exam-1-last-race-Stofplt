@@ -1,13 +1,12 @@
 import { useEffect, useState } from "react";
-import { Alert, Spinner } from "react-bootstrap";
-import { useParams } from "react-router";
+import { Spinner } from "react-bootstrap";
+import { useNavigate, useParams } from "react-router";
 import { getGameResult } from "../api/api.js";
-import ExecutionStep from "../components/ExecutionStep.jsx";
 
 function ResultPage() {
   const { gameId } = useParams();
+  const navigate = useNavigate();
   const [result, setResult] = useState(null);
-  const [error, setError] = useState("");
 
   useEffect(() => {
     let active = true;
@@ -18,20 +17,16 @@ function ResultPage() {
           setResult(data);
         }
       })
-      .catch((err) => {
+      .catch(() => {
         if (active) {
-          setError(err.message);
+          navigate("/", { replace: true });
         }
       });
 
     return () => {
       active = false;
     };
-  }, [gameId]);
-
-  if (error) {
-    return <Alert variant="danger">{error}</Alert>;
-  }
+  }, [gameId, navigate]);
 
   if (!result) {
     return (
@@ -41,36 +36,35 @@ function ResultPage() {
     );
   }
 
+  const won = result.status === "completed";
+
   return (
     <section className="result-page d-grid gap-4">
-      <h1>Result</h1>
-      <dl className="planning-summary">
-        <div>
-          <dt>Status</dt>
-          <dd>{result.status}</dd>
-        </div>
-        <div>
-          <dt>Score</dt>
-          <dd>{result.score}</dd>
-        </div>
-        <div>
-          <dt>Start</dt>
-          <dd>{result.startStation.name}</dd>
-        </div>
-        <div>
-          <dt>Destination</dt>
-          <dd>{result.destinationStation.name}</dd>
-        </div>
-      </dl>
+      <div className="result-header">
+        <h1>{won ? "Victory!" : "Game Over"}</h1>
+      </div>
 
-      <section>
-        <h2>Executed route</h2>
-        <div className="d-grid gap-3">
-          {result.steps.map((step) => (
-            <ExecutionStep key={step.index} step={step} />
-          ))}
+      <div className="result-card nes-container is-rounded mx-auto d-flex flex-column align-items-center gap-4">
+        <div className="result-score d-flex flex-column align-items-center gap-2">
+          <span className="result-score-label">
+            {won ? "Final score" : "Score"}
+          </span>
+          <div className="d-flex align-items-center justify-content-center gap-2">
+            <i className="nes-icon coin is-medium" aria-hidden="true" />
+            <span className="result-score-value">{result.score}</span>
+          </div>
         </div>
-      </section>
+      </div>
+
+      <div className="result-actions d-flex justify-content-end w-100 mx-auto">
+        <button
+          className="nes-btn is-success nes-pointer"
+          onClick={() => navigate("/setup", { replace: true })}
+          type="button"
+        >
+          Play again
+        </button>
+      </div>
     </section>
   );
 }

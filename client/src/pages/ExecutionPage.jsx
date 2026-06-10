@@ -1,7 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import { Spinner } from "react-bootstrap";
 import { useNavigate, useParams } from "react-router";
-import { executeNextStep, getExecutionState, getNetwork } from "../api/api.js";
+import {
+  executeNextStep,
+  getExecutionNetwork,
+  getExecutionState,
+} from "../api/api.js";
 import ExecutionMap from "../components/ExecutionMap.jsx";
 
 function ExecutionPage() {
@@ -14,28 +18,27 @@ function ExecutionPage() {
   const [coins, setCoins] = useState(20);
   const [lastEvent, setLastEvent] = useState(null);
   const [executedPaths, setExecutedPaths] = useState([]);
+  const [animatedSegmentId, setAnimatedSegmentId] = useState(null);
   const [allStepsDone, setAllStepsDone] = useState(false);
   const executingRef = useRef(false);
 
   useEffect(() => {
     let active = true;
 
-    Promise.all([getNetwork(), getExecutionState(gameId)])
+    Promise.all([getExecutionNetwork(), getExecutionState(gameId)])
       .then(([networkData, execState]) => {
         if (active) {
+          const executed = execState.steps.map((s) => ({
+            segmentId: s.segmentId,
+            path: s.path,
+            lineId: s.lineId,
+          }));
+
           setNetwork(networkData);
           setCoins(execState.coins);
-          setExecutedPaths(
-            execState.steps.map((s) => ({
-              segmentId: s.segmentId,
-              path: s.path,
-              lineId: s.lineId,
-            })),
-          );
-          if (execState.steps.length > 0) {
-            const last = execState.steps[execState.steps.length - 1];
-            setLastEvent(last.event);
-          }
+          setExecutedPaths(executed);
+          setAnimatedSegmentId(executed.at(-1)?.segmentId ?? null);
+          setLastEvent(execState.lastEvent);
           if (execState.status === "completed") {
             setCompleted(true);
             setScore(execState.score);
@@ -44,9 +47,7 @@ function ExecutionPage() {
         }
       })
       .catch(() => {
-        if (active) {
-          navigate("/", { replace: true });
-        }
+        if (active) navigate("/", { replace: true });
       });
 
     return () => {
@@ -76,6 +77,7 @@ function ExecutionPage() {
           lineId: result.step.lineId,
         },
       ]);
+      setAnimatedSegmentId(result.step.segmentId);
 
       if (result.completed) {
         setCompleted(true);
@@ -110,10 +112,11 @@ function ExecutionPage() {
 
       <div className="execution-map-wrapper">
         <ExecutionMap
+          animatedSegmentId={animatedSegmentId}
           executedPaths={executedPaths}
           lines={network.lines}
           stations={network.stations}
-          allSegments={network.segments}
+          networkSegments={network.segments}
         />
       </div>
 

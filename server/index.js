@@ -141,6 +141,29 @@ app.get("/api/network/planning", isLoggedIn, async (req, res, next) => {
   }
 });
 
+app.get("/api/network/execution", isLoggedIn, async (req, res, next) => {
+  try {
+    const [stations, lines, segments] = await Promise.all([
+      getStations(),
+      getLines(),
+      getSegments(),
+    ]);
+
+    res.json({
+      stations,
+      lines,
+      segments: segments.map((segment) => ({
+        id: segment.id,
+        fromStationId: segment.fromStationId,
+        toStationId: segment.toStationId,
+        lineId: segment.lineId,
+      })),
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
 app.post("/api/games", isLoggedIn, async (req, res, next) => {
   try {
     if (!req.session.networkLoaded) {
@@ -328,9 +351,6 @@ app.post("/api/games/:id/execute/next", isLoggedIn, async (req, res, next) => {
       step: {
         index: step.step_index,
         segmentId: step.segment_id,
-        fromStation: step.from_station_name,
-        toStation: step.to_station_name,
-        line: step.line_name,
         lineId: step.line_id,
         path: step.path,
         event: {
@@ -348,40 +368,40 @@ app.post("/api/games/:id/execute/next", isLoggedIn, async (req, res, next) => {
 app.get("/api/games/:id/execution", isLoggedIn, async (req, res, next) => {
   try {
     const gameId = Number(req.params.id);
-
     if (!Number.isInteger(gameId) || gameId <= 0) {
       return res.status(422).json({ error: "Invalid game id" });
     }
-
     const game = await getGameForUser(gameId, req.user.id);
-
     if (!game) {
       return res.status(404).json({ error: "Game not found" });
     }
     if (game.status !== "executing" && game.status !== "completed") {
       return res.status(409).json({ error: "The game is not in execution" });
     }
-
     const [coins, steps] = await Promise.all([
       getCurrentCoins(gameId),
       getExecutedSteps(gameId),
     ]);
-
     res.json({
       gameId: game.id,
       status: game.status,
       coins,
-      steps: steps.map((step) => ({
-        index: step.step_index,
-        segmentId: step.segment_id,
-        lineId: step.line_id,
-        path: step.path,
-        fromStation: step.from_station_name,
-        toStation: step.to_station_name,
-        line: step.line_name,
-        event: step.event_description
-          ? { description: step.event_description, effect: step.event_effect }
+      lastEvent:
+        steps.length > 0
+          ? {
+              description: steps[steps.length - 1].event_description,
+              effect: steps[steps.length - 1].event_effect,
+            }
           : null,
+      steps: steps.map((s) => ({
+        index: s.step_index,
+        segmentId: s.segment_id,
+        lineId: s.line_id,
+        path: s.path,
+        event: {
+          description: s.event_description,
+          effect: s.event_effect,
+        },
       })),
       score: game.status === "completed" ? game.final_score : undefined,
     });

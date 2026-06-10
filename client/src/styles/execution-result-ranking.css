@@ -100,7 +100,37 @@
 .ranking-page {
     margin-inline: auto;
     max-width: 1080px;
-    justify-content: center;
+}
+
+.result-page {
+    margin-inline: auto;
+    max-width: 1080px;
+}
+
+.result-header,
+.result-actions {
+    margin-inline: auto;
+    max-width: 1080px;
+    width: 100%;
+}
+
+.result-card {
+    background: #ffffff;
+    box-sizing: border-box;
+    max-width: 520px;
+    padding: 2rem;
+    width: 100%;
+}
+
+.result-score-label {
+    color: #66665f;
+    font-family: "Press Start 2P", system-ui, sans-serif;
+    font-size: 0.8rem;
+}
+
+.result-score-value {
+    font-family: "Press Start 2P", system-ui, sans-serif;
+    font-size: 1.5rem;
 }
 
 .ranking-header {

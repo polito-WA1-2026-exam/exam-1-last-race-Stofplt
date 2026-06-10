@@ -386,7 +386,7 @@ async function getExecutedSteps(gameId) {
      JOIN stations fs ON fs.id = s.from_station_id
      JOIN stations ts ON ts.id = s.to_station_id
      JOIN lines l ON l.id = s.line_id
-     LEFT JOIN events e ON e.id = gs.event_id
+     JOIN events e ON e.id = gs.event_id
      WHERE gs.game_id = ?
      ORDER BY gs.step_index`,
     [gameId],

@@ -34,6 +34,10 @@ async function getNetworkStations() {
   return await requestJson("/network/stations");
 }
 
+async function getExecutionNetwork() {
+  return await requestJson("/network/execution");
+}
+
 async function createGame() {
   return await requestJson("/games", { method: "POST" });
 }
@@ -72,6 +76,7 @@ export {
   SERVER_URL,
   createGame,
   executeNextStep,
+  getExecutionNetwork,
   getExecutionState,
   getGameResult,
   getHealth,

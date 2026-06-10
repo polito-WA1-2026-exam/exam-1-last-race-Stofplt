@@ -75,13 +75,13 @@ function getLabelOffsetByStation(stations) {
 }
 
 function ExecutionMap({
+  animatedSegmentId = null,
   executedPaths = [],
   lines = [],
   stations = [],
-  allSegments = [],
+  networkSegments = [],
 }) {
   const svgRef = useRef(null);
-  const renderedIdsRef = useRef(new Set());
 
   const lineById = useMemo(() => new Map(lines.map((l) => [l.id, l])), [lines]);
   const labelOffsetByStation = useMemo(
@@ -90,14 +90,14 @@ function ExecutionMap({
   );
   const viewBox = useMemo(() => buildViewBox(stations), [stations]);
 
-  const executedSegments = useMemo(() => {
-    const segById = new Map(allSegments.map((s) => [s.id, s]));
-    return executedPaths.map((p) => segById.get(p.segmentId)).filter(Boolean);
-  }, [executedPaths, allSegments]);
+  const executedSegments = useMemo(
+    () => executedPaths.filter((segment) => segment.path),
+    [executedPaths],
+  );
 
   const stationLineIds = useMemo(
-    () => getStationLineIds(stations, allSegments),
-    [stations, allSegments],
+    () => getStationLineIds(stations, networkSegments),
+    [stations, networkSegments],
   );
 
   useEffect(() => {
@@ -112,9 +112,9 @@ function ExecutionMap({
       pixels: [],
     };
     const frame = { id: null };
-    const previouslyRendered = renderedIdsRef.current;
-    const currentIds = new Set(executedSegments.map((s) => s.id));
-    const hasNew = executedSegments.some((s) => !previouslyRendered.has(s.id));
+    const hasAnimatedSegment = executedSegments.some(
+      (segment) => segment.segmentId === animatedSegmentId,
+    );
 
     function buildMarker(station, annotationLayer) {
       const lineIds = stationLineIds.get(station.id) ?? new Set();
@@ -166,7 +166,7 @@ function ExecutionMap({
         sourceLayer.appendChild(pathEl);
 
         const length = pathEl.getTotalLength();
-        const wasRendered = previouslyRendered.has(segment.id);
+        const shouldAnimate = segment.segmentId === animatedSegmentId;
 
         for (let distance = 0; distance <= length; distance += PIXEL_STEP) {
           const point = pathEl.getPointAtLength(distance);
@@ -180,7 +180,7 @@ function ExecutionMap({
             y: point.y - PIXEL_SIZE / 2 + SHADOW_OFFSET,
           });
 
-          if (wasRendered) {
+          if (!shouldAnimate) {
             shadowPixel.classList.add("is-visible");
           }
 
@@ -200,7 +200,7 @@ function ExecutionMap({
             y: point.y - PIXEL_SIZE / 2,
           });
 
-          if (wasRendered) {
+          if (!shouldAnimate) {
             colorPixel.classList.add("is-visible");
           }
 
@@ -254,9 +254,7 @@ function ExecutionMap({
 
     stations.forEach((station) => buildMarker(station, annotationLayer));
 
-    renderedIdsRef.current = currentIds;
-
-    if (hasNew) {
+    if (hasAnimatedSegment) {
       frame.id = requestAnimationFrame(animate);
     }
 
@@ -268,6 +266,7 @@ function ExecutionMap({
     };
   }, [
     executedSegments,
+    animatedSegmentId,
     labelOffsetByStation,
     lineById,
     lines,
