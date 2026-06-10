@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
-import { Alert, Spinner, Table } from "react-bootstrap";
+import { Spinner } from "react-bootstrap";
+import { useNavigate } from "react-router";
 import { getRanking } from "../api/api.js";
 
 function RankingPage() {
+  const navigate = useNavigate();
   const [ranking, setRanking] = useState(null);
-  const [error, setError] = useState("");
 
   useEffect(() => {
     let active = true;
@@ -15,20 +16,16 @@ function RankingPage() {
           setRanking(data);
         }
       })
-      .catch((err) => {
+      .catch(() => {
         if (active) {
-          setError(err.message);
+          navigate("/", { replace: true });
         }
       });
 
     return () => {
       active = false;
     };
-  }, []);
-
-  if (error) {
-    return <Alert variant="danger">{error}</Alert>;
-  }
+  }, [navigate]);
 
   if (!ranking) {
     return (
@@ -40,28 +37,33 @@ function RankingPage() {
 
   return (
     <section className="ranking-page d-grid gap-4">
-      <h1>Ranking</h1>
+      <div className="ranking-header">
+        <h1>Ranking</h1>
+      </div>
+
       {ranking.length === 0 ? (
         <p className="text-secondary mb-0">No completed games yet.</p>
       ) : (
-        <Table className="ranking-table" hover responsive>
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Player</th>
-              <th>Best score</th>
-            </tr>
-          </thead>
-          <tbody>
-            {ranking.map((entry, index) => (
-              <tr key={entry.userId}>
-                <td>{index + 1}</td>
-                <td>{entry.name}</td>
-                <td>{entry.bestScore}</td>
+        <div className="ranking-table-wrapper">
+          <table className="nes-table is-bordered is-centered">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Player</th>
+                <th>Best score</th>
               </tr>
-            ))}
-          </tbody>
-        </Table>
+            </thead>
+            <tbody>
+              {ranking.map((entry, index) => (
+                <tr key={entry.userId}>
+                  <td>{index + 1}</td>
+                  <td>{entry.name}</td>
+                  <td>{entry.bestScore}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
     </section>
   );

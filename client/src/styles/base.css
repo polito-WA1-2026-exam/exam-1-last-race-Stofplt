@@ -3,6 +3,7 @@ html {
     --app-content-padding: 2rem; /* Keeps the outer app spacing in one reusable value. */
     --app-content-padding-block: 4rem; /* Lets Planning subtract top and bottom app padding from viewport height. */
     --navbar-height: 88px; /* Matches the fixed visual height of the custom NES navbar. */
+    --footer-height: 56px; /* Matches the footer min-height for viewport calculations. */
     --nes-cursor-pointer:
         url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAzElEQVRYR+2X0Q6AIAhF5f8/2jYXZkwEjNSVvVUjDpcrGgT7FUkI2D9xRfQETwNIiWO85wfINfQUEyxBG2ArsLwC0jioGt5zFcwF4OYDPi/mBYKm4t0U8ATgRm3ThFoAqkhNgWkA0jJLvaOVSs7j3qMnSgXWBMiWPXe94QqMBMBc1VZIvaTu5u5pQewq0EqNZvIEMCmxAawK0DNkay9QmfFNAJUXfgGgUkLaE7j/h8fnASkxHTz0DGIBMCnBeeM7AArpUd3mz2x3C7wADglA8BcWMZhZAAAAAElFTkSuQmCC)
             14 0,
@@ -10,6 +11,8 @@ html {
 }
 
 body {
+    display: flex;
+    flex-direction: column;
     min-height: 100vh; /* Fallback for browsers without dynamic viewport units. */
     min-height: 100dvh; /* Uses the actually visible viewport on modern browsers. */
     background: #e8eef8; /* Defines the page background because Bootstrap theme colors do not match the game palette. */
@@ -18,13 +21,14 @@ body {
         "Press Start 2P", system-ui, sans-serif; /* Applies the project font globally instead of repeating it per component. */
 }
 
+#root {
+    display: flex;
+    flex: 1 0 auto;
+    flex-direction: column;
+}
+
 main {
-    min-height: calc(
-        100vh - var(--navbar-height)
-    ); /* Keeps the routed content at least below-navbar height in older browsers. */
-    min-height: calc(
-        100dvh - var(--navbar-height)
-    ); /* Keeps routed content aligned to visible viewport height. */
+    flex: 1 0 auto;
 }
 
 button,
@@ -51,12 +55,6 @@ button.nes-btn.nes-pointer:active {
 
 .app-content {
     box-sizing: border-box; /* Includes padding in viewport-height calculations. */
-    min-height: calc(
-        100vh - var(--navbar-height)
-    ); /* Gives pages the remaining viewport height below the navbar. */
-    min-height: calc(
-        100dvh - var(--navbar-height)
-    ); /* Uses visible viewport height when supported. */
     padding: var(
         --app-content-padding
     ); /* Centralizes page padding rather than repeating Bootstrap spacing everywhere. */
@@ -104,4 +102,12 @@ button.nes-btn.nes-pointer:active {
     fill: currentColor; /* Lets the SVG inherit NES button foreground color. */
     height: 22px; /* Keeps the icon visually centered inside the 42px button. */
     width: 22px; /* Keeps the icon square and balanced. */
+}
+
+.app-footer {
+    background: #181825;
+    border-top: 4px solid #171720;
+    color: #88889a;
+    font-size: 0.65rem;
+    min-height: 56px;
 }

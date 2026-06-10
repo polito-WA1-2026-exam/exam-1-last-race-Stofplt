@@ -32,7 +32,8 @@
         --planning-gap
     ); /* Keeps the right rail spaced with a fixed rhythm. */
     height: calc(
-        100dvh - var(--navbar-height) - var(--app-content-padding-block)
+        100dvh - var(--navbar-height) - var(--app-content-padding-block) -
+            var(--footer-height)
     ); /* Locks the sticky rail to viewport height so the route builder fills remaining space. */
     overflow: hidden; /* Forces the route builder to be the scroll container. */
     position: sticky; /* Pins the right rail while the page scrolls. */

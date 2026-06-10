@@ -98,12 +98,33 @@
 }
 
 .ranking-page {
-    max-width: 760px; /* Keeps the ranking table readable on wide screens. */
+    margin-inline: auto;
+    max-width: 1080px;
+    justify-content: center;
 }
 
-.ranking-table {
-    background: #ffffff; /* Keeps table surface white over the app background. */
-    border: 1px solid #d8d8d2; /* Adds a subtle table frame. */
-    border-radius: 8px; /* Matches other non-NES cards. */
-    overflow: hidden; /* Clips table corners to the rounded frame. */
+.ranking-header {
+    margin-inline: auto;
+    max-width: 1080px;
+    width: 100%;
+}
+
+.ranking-table-wrapper {
+    display: flex;
+    justify-content: center;
+    margin-inline: auto;
+    max-width: 1080px;
+    overflow-x: auto;
+    width: 75%;
+    height: 100%;
+}
+
+.ranking-table-wrapper .nes-table {
+    border-image-repeat: stretch;
+    width: 75%;
+}
+
+.ranking-table-wrapper .nes-table th,
+.ranking-table-wrapper .nes-table td {
+    padding: 0.85rem 1rem;
 }

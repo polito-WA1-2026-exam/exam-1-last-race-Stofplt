@@ -1,4 +1,5 @@
 import { BrowserRouter, Navigate, Route, Routes } from "react-router";
+import AppFooter from "./components/AppFooter.jsx";
 import AppNavbar from "./components/AppNavbar.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import { UserProvider } from "./contexts/UserContext.js";
@@ -64,6 +65,7 @@ function App() {
             </Routes>
           </div>
         </main>
+        <AppFooter />
       </UserProvider>
     </BrowserRouter>
   );
