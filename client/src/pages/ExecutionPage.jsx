@@ -1,14 +1,13 @@
 import { useEffect, useRef, useState } from "react";
-import { Alert, Spinner } from "react-bootstrap";
+import { Spinner } from "react-bootstrap";
 import { useNavigate, useParams } from "react-router";
-import { executeNextStep, getNetwork } from "../api/api.js";
+import { executeNextStep, getExecutionState, getNetwork } from "../api/api.js";
 import ExecutionMap from "../components/ExecutionMap.jsx";
 
 function ExecutionPage() {
   const { gameId } = useParams();
   const navigate = useNavigate();
   const [network, setNetwork] = useState(null);
-  const [error, setError] = useState("");
   const [executing, setExecuting] = useState(false);
   const [completed, setCompleted] = useState(false);
   const [score, setScore] = useState(null);
@@ -21,29 +20,45 @@ function ExecutionPage() {
   useEffect(() => {
     let active = true;
 
-    getNetwork()
-      .then((data) => {
+    Promise.all([getNetwork(), getExecutionState(gameId)])
+      .then(([networkData, execState]) => {
         if (active) {
-          setNetwork(data);
+          setNetwork(networkData);
+          setCoins(execState.coins);
+          setExecutedPaths(
+            execState.steps.map((s) => ({
+              segmentId: s.segmentId,
+              path: s.path,
+              lineId: s.lineId,
+            })),
+          );
+          if (execState.steps.length > 0) {
+            const last = execState.steps[execState.steps.length - 1];
+            setLastEvent(last.event);
+          }
+          if (execState.status === "completed") {
+            setCompleted(true);
+            setScore(execState.score);
+            setAllStepsDone(true);
+          }
         }
       })
-      .catch((err) => {
+      .catch(() => {
         if (active) {
-          setError(err.message);
+          navigate("/", { replace: true });
         }
       });
 
     return () => {
       active = false;
     };
-  }, []);
+  }, [gameId, navigate]);
 
   async function handleExecute() {
     if (executingRef.current || allStepsDone) {
       return;
     }
 
-    setError("");
     setExecuting(true);
     executingRef.current = true;
 
@@ -67,16 +82,12 @@ function ExecutionPage() {
         setScore(result.score);
         setAllStepsDone(true);
       }
-    } catch (err) {
-      setError(err.message);
+    } catch {
+      navigate("/", { replace: true });
     } finally {
       setExecuting(false);
       executingRef.current = false;
     }
-  }
-
-  if (error && !network) {
-    return <Alert variant="danger">{error}</Alert>;
   }
 
   if (!network) {
@@ -96,8 +107,6 @@ function ExecutionPage() {
           <span>{coins}</span>
         </div>
       </div>
-
-      {error && <Alert variant="danger">{error}</Alert>}
 
       <div className="execution-map-wrapper">
         <ExecutionMap
@@ -150,7 +159,7 @@ function ExecutionPage() {
             onClick={handleExecute}
             type="button"
           >
-            {executing ? "Executing..." : "Next"}
+            Next
           </button>
         )}
       </div>

@@ -188,9 +188,15 @@ app.get("/api/games/:id/planning", isLoggedIn, async (req, res, next) => {
         .json({ error: "The game is not accepting a route" });
     }
 
+    const startedAt = req.session.gameStartTimes?.[gameId];
+    const remainingSeconds = startedAt
+      ? Math.max(0, 90 - Math.floor((Date.now() - startedAt) / 1000))
+      : 90;
+
     res.json({
       gameId: game.id,
       status: game.status,
+      remainingSeconds,
       startStation: {
         id: game.start_station_id,
         name: game.start_station_name,
@@ -220,9 +226,7 @@ app.post("/api/games/:id/route", isLoggedIn, async (req, res, next) => {
         (segmentId) => !Number.isInteger(segmentId) || segmentId <= 0,
       )
     ) {
-      return res
-        .status(422)
-        .json({ error: "segments must contain positive integers" });
+      return res.status(422).json({ error: "segments must be valid" });
     }
 
     const game = await getGameForUser(gameId, req.user.id);
@@ -335,6 +339,51 @@ app.post("/api/games/:id/execute/next", isLoggedIn, async (req, res, next) => {
         },
         coins: updatedCoins,
       },
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+app.get("/api/games/:id/execution", isLoggedIn, async (req, res, next) => {
+  try {
+    const gameId = Number(req.params.id);
+
+    if (!Number.isInteger(gameId) || gameId <= 0) {
+      return res.status(422).json({ error: "Invalid game id" });
+    }
+
+    const game = await getGameForUser(gameId, req.user.id);
+
+    if (!game) {
+      return res.status(404).json({ error: "Game not found" });
+    }
+    if (game.status !== "executing" && game.status !== "completed") {
+      return res.status(409).json({ error: "The game is not in execution" });
+    }
+
+    const [coins, steps] = await Promise.all([
+      getCurrentCoins(gameId),
+      getExecutedSteps(gameId),
+    ]);
+
+    res.json({
+      gameId: game.id,
+      status: game.status,
+      coins,
+      steps: steps.map((step) => ({
+        index: step.step_index,
+        segmentId: step.segment_id,
+        lineId: step.line_id,
+        path: step.path,
+        fromStation: step.from_station_name,
+        toStation: step.to_station_name,
+        line: step.line_name,
+        event: step.event_description
+          ? { description: step.event_description, effect: step.event_effect }
+          : null,
+      })),
+      score: game.status === "completed" ? game.final_score : undefined,
     });
   } catch (err) {
     next(err);

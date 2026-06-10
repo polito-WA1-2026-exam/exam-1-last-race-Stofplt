@@ -115,6 +115,7 @@ function PlanningPage() {
           setMapStations(stationData.stations);
           setNetwork(networkData);
           setGame(gameData);
+          setTimeLeft(gameData.remainingSeconds);
         }
       })
       .catch(() => {
@@ -162,16 +163,20 @@ function PlanningPage() {
     }
 
     const startedAt = Date.now();
+    const initialSeconds = game.remainingSeconds ?? PLANNING_SECONDS;
+
+    setTimeLeft(initialSeconds);
+
     const timerId = window.setInterval(() => {
       const elapsedSeconds = Math.floor((Date.now() - startedAt) / 1000);
-      setTimeLeft(Math.max(PLANNING_SECONDS - elapsedSeconds, 0));
+      setTimeLeft(Math.max(initialSeconds - elapsedSeconds, 0));
     }, 250);
     const timeoutId = window.setTimeout(() => {
       if (!autoSubmittedRef.current) {
         autoSubmittedRef.current = true;
         submitSelectedRoute(selectedSegmentIdsRef.current);
       }
-    }, PLANNING_SECONDS * 1000);
+    }, initialSeconds * 1000);
 
     return () => {
       window.clearInterval(timerId);

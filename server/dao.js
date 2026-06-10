@@ -376,6 +376,8 @@ async function getExecutedSteps(gameId) {
             fs.name AS from_station_name,
             s.to_station_id,
             ts.name AS to_station_name,
+            s.line_id,
+            s.path,
             l.name AS line_name,
             e.description AS event_description,
             e.effect AS event_effect

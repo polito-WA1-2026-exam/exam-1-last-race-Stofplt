@@ -3,7 +3,7 @@ const SERVER_URL = "http://localhost:3001/api";
 async function requestJson(path, options = {}) {
   const response = await fetch(`${SERVER_URL}${path}`, {
     credentials: "include",
-    ...options
+    ...options,
   });
 
   if (!response.ok) {
@@ -46,14 +46,18 @@ async function submitRoute(gameId, segments) {
   return await requestJson(`/games/${gameId}/route`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ segments })
+    body: JSON.stringify({ segments }),
   });
 }
 
 async function executeNextStep(gameId) {
   return await requestJson(`/games/${gameId}/execute/next`, {
-    method: "POST"
+    method: "POST",
   });
+}
+
+async function getExecutionState(gameId) {
+  return await requestJson(`/games/${gameId}/execution`);
 }
 
 async function getGameResult(gameId) {
@@ -68,6 +72,7 @@ export {
   SERVER_URL,
   createGame,
   executeNextStep,
+  getExecutionState,
   getGameResult,
   getHealth,
   getInstructions,
@@ -76,5 +81,5 @@ export {
   getPlanningNetwork,
   getPlanningGame,
   getRanking,
-  submitRoute
+  submitRoute,
 };
