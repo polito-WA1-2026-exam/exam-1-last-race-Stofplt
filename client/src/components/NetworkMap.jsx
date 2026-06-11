@@ -95,7 +95,14 @@ function NetworkMap({ lines = [], segments = [], stations = [] }) {
         const point = path.getPointAtLength(distance);
         const totalDistance = offset + distance;
 
-        buildPixel(point, lineId, totalDistance, "#000000", true, pixelLayer);
+        buildPixel(
+          point,
+          lineId,
+          totalDistance,
+          "var(--map-pixel-shadow-color)",
+          true,
+          pixelLayer
+        );
         buildPixel(point, lineId, totalDistance, color, false, pixelLayer);
       }
     }
@@ -118,7 +125,10 @@ function NetworkMap({ lines = [], segments = [], stations = [] }) {
 
       if (!isInterchange && lineIds.size === 1) {
         const [lineId] = lineIds;
-        point.setAttribute("stroke", lineById.get(lineId)?.color ?? "#f7f7f2");
+        point.setAttribute(
+          "stroke",
+          lineById.get(lineId)?.color ?? "var(--map-text-color)"
+        );
       }
 
       const text = svgEl("text", {

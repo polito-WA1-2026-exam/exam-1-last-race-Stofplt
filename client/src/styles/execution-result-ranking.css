@@ -30,7 +30,7 @@
 }
 
 .execution-coins {
-    background: #ffffff;
+    background: var(--surface-color);
     box-sizing: border-box;
     font-family: "Press Start 2P", system-ui, sans-serif;
     font-size: 0.95rem;
@@ -38,7 +38,7 @@
 }
 
 .execution-event {
-    background: #ffffff;
+    background: var(--surface-color);
     box-sizing: border-box;
     max-width: 1080px;
     padding: 0.65rem 0.85rem;
@@ -57,23 +57,23 @@
 }
 
 .execution-event-effect.is-positive {
-    color: #92cc41;
+    color: var(--success-color);
 }
 
 .execution-event-effect.is-negative {
-    color: #e76e55;
+    color: var(--danger-color);
 }
 
 .execution-step {
-    background: #ffffff; /* Matches the app's light panel color. */
-    border: 1px solid #d8d8d2; /* Adds a subtle separator without a full NES container. */
+    background: var(--surface-color); /* Matches the app's light panel color. */
+    border: 1px solid var(--subtle-border-color); /* Adds a subtle separator without a full NES container. */
     border-radius: 8px; /* Keeps execution cards compact and readable. */
     padding: 0.9rem; /* Gives execution details readable spacing. */
 }
 
 .planning-summary {
-    background: #ffffff; /* Gives result summary a simple white panel. */
-    border: 1px solid #d8d8d2; /* Separates the summary from the page background. */
+    background: var(--surface-color); /* Gives result summary a simple white panel. */
+    border: 1px solid var(--subtle-border-color); /* Separates the summary from the page background. */
     border-radius: 8px; /* Matches execution card rounding. */
     display: grid; /* Stacks key/value rows. */
 }
@@ -86,11 +86,11 @@
 }
 
 .planning-summary div + div {
-    border-top: 1px solid #eeeeea; /* Separates summary rows. */
+    border-top: 1px solid var(--subtle-divider-color); /* Separates summary rows. */
 }
 
 .planning-summary dt {
-    color: #66665f; /* Makes summary labels secondary. */
+    color: var(--muted-text-color); /* Makes summary labels secondary. */
 }
 
 .planning-summary dd {
@@ -115,7 +115,7 @@
 }
 
 .result-card {
-    background: #ffffff;
+    background: var(--surface-color);
     box-sizing: border-box;
     max-width: 520px;
     padding: 2rem;
@@ -123,7 +123,7 @@
 }
 
 .result-score-label {
-    color: #66665f;
+    color: var(--muted-text-color);
     font-family: "Press Start 2P", system-ui, sans-serif;
     font-size: 0.8rem;
 }
@@ -150,11 +150,13 @@
 }
 
 .ranking-table-wrapper .nes-table {
+    background: var(--ranking-table-background-color);
     border-image-repeat: stretch;
     width: 75%;
 }
 
 .ranking-table-wrapper .nes-table th,
 .ranking-table-wrapper .nes-table td {
+    background: var(--ranking-table-background-color);
     padding: 0.85rem 1rem;
 }

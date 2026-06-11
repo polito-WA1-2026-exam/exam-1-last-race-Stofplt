@@ -7,18 +7,18 @@
 }
 
 .metro-map-panel {
-    --metro-bg: #1f1f1f; /* Defines the setup map dark background. */
-    --metro-grid: rgb(255 255 255 / 4%); /* Defines subtle map grid lines. */
+    --metro-bg: var(--map-background-color); /* Defines the setup map dark background. */
+    --metro-grid: var(--map-grid-color); /* Defines subtle map grid lines. */
     --metro-shadow-opacity: 0.45; /* Keeps animated line shadows consistent. */
-    --metro-text: #f7f7f2; /* Defines map label color. */
+    --metro-text: var(--map-text-color); /* Defines map label color. */
     aspect-ratio: 7 / 5; /* Preserves the setup map proportion. */
     background:
         linear-gradient(var(--metro-grid) 1px, transparent 1px),
         linear-gradient(90deg, var(--metro-grid) 1px, transparent 1px),
         var(--metro-bg); /* Draws the pixel grid over the map background. */
     background-size: 8px 8px; /* Matches the pixel-grid scale. */
-    border: 4px solid #171720; /* Frames the SVG without relying on NES container markup. */
-    box-shadow: 8px 8px 0 #111119; /* Adds the heavy pixel shadow used by setup. */
+    border: 4px solid var(--border-color); /* Frames the SVG without relying on NES container markup. */
+    box-shadow: 8px 8px 0 var(--shadow-color); /* Adds the heavy pixel shadow used by setup. */
     height: min(64vh, 580px); /* Keeps the setup map large but bounded. */
     margin-inline: auto; /* Centers the setup map. */
     max-width: 1080px; /* Prevents over-wide map stretching. */
@@ -50,7 +50,7 @@
 }
 
 .metro-pixel {
-    stroke: rgb(0 0 0 / 55%); /* Adds a small dark outline to colored pixels. */
+    stroke: var(--map-pixel-outline-color); /* Adds a small dark outline to colored pixels. */
     stroke-width: 0.35px; /* Keeps the outline subtle at SVG scale. */
 }
 
@@ -103,7 +103,7 @@
     letter-spacing: 0; /* Prevents pixel font distortion. */
     paint-order: stroke fill; /* Draws dark halo behind labels. */
     pointer-events: none; /* Keeps label text from blocking station hover. */
-    stroke: rgb(31 31 31 / 75%); /* Gives labels readable dark outline. */
+    stroke: var(--map-label-outline-color); /* Gives labels readable dark outline. */
     stroke-width: 2.5px; /* Matches Planning map label outline. */
     transform: translateX(
         0

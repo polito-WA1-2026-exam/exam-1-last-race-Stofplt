@@ -1,5 +1,39 @@
 /* Global app constants used where Bootstrap utilities cannot know the navbar height. */
 html {
+    /* App color palette: edit these values to test themes. */
+    --primary-color: #f4828c;
+    --secondary-color: #2f6f9f;
+    --accent-color: #f4828c;
+    --background-color: #fff8e7;
+    --surface-color: #f7ead0;
+    --surface-alt-color: #f4c7a1;
+    --instruction-card-background-color: #fff8e7;
+    --instruction-number-background-color: #f4828c;
+    --login-panel-background-color: #fff8e7;
+    --ranking-table-background-color: #fff8e7;
+    --border-color: #171720;
+    --shadow-color: #9f7d58;
+    --success-color: #4aa52e;
+    --danger-color: #d64045;
+    --map-background-color: var(--instruction-card-background-color);
+    --map-text-color: #171720;
+    --map-grid-color: rgb(23 23 32 / 6%);
+    --map-label-outline-color: rgb(255 248 231 / 82%);
+    --map-pixel-outline-color: rgb(23 23 32 / 58%);
+    --map-pixel-shadow-color: #171720;
+    --overlay-color: rgb(23 23 32 / 72%);
+    --subtle-border-color: #d7b98f;
+    --subtle-divider-color: #e5caa5;
+    --selected-segment-background-color: #f4828c;
+    --selected-segment-shadow-color: #84454b;
+    --selected-segment-text-color: #171720;
+    --available-segment-background-color: #fff8e7;
+    --text-color: #171720;
+    --text-inverted-color: #171720;
+    --muted-text-color: #5f6470;
+    --footer-text-color: #171720;
+    --navbar-hover-text-color: #fff8e7;
+    --navbar-user-text-color: #fff8e7;
     --app-content-padding: 2rem; /* Keeps the outer app spacing in one reusable value. */
     --app-content-padding-block: 4rem; /* Lets Planning subtract top and bottom app padding from viewport height. */
     --navbar-height: 88px; /* Matches the fixed visual height of the custom NES navbar. */
@@ -15,8 +49,8 @@ body {
     flex-direction: column;
     min-height: 100vh; /* Fallback for browsers without dynamic viewport units. */
     min-height: 100dvh; /* Uses the actually visible viewport on modern browsers. */
-    background: #e8eef8; /* Defines the page background because Bootstrap theme colors do not match the game palette. */
-    color: #171720; /* Sets the app text color to match the NES-inspired dark ink. */
+    background: var(--background-color); /* Defines the page background because Bootstrap theme colors do not match the game palette. */
+    color: var(--text-color); /* Sets the app text color to match the NES-inspired dark ink. */
     font-family:
         "Press Start 2P", system-ui, sans-serif; /* Applies the project font globally instead of repeating it per component. */
 }
@@ -66,8 +100,8 @@ button.nes-btn.nes-pointer:active {
 
 /* Navbar colors and sizes are custom because Bootstrap navbars do not match the NES game header. */
 .app-navbar {
-    background: #181825; /* Provides the dark game header background. */
-    border-bottom: 4px solid #171720; /* Adds the pixel-thick separation from page content. */
+    background: var(--primary-color); /* Provides the dark game header background. */
+    border-bottom: 4px solid var(--border-color); /* Adds the pixel-thick separation from page content. */
     min-height: var(
         --navbar-height
     ); /* Keeps content height calculations synchronized with the visual navbar. */
@@ -75,7 +109,7 @@ button.nes-btn.nes-pointer:active {
 
 .brand-link,
 .nav-link-pixel {
-    color: #ffffff; /* Keeps nav links white on the dark custom navbar. */
+    color: var(--text-inverted-color); /* Keeps nav links white on the dark custom navbar. */
 }
 
 .brand-link {
@@ -84,11 +118,11 @@ button.nes-btn.nes-pointer:active {
 
 .brand-link:hover,
 .nav-link-pixel:hover {
-    color: #facc15; /* Matches the yellow player/name accent on hover. */
+    color: var(--navbar-hover-text-color); /* Keeps navbar hover text legible on the active theme color. */
 }
 
 .user-name {
-    color: #facc15; /* Highlights the logged-in player with the same yellow accent. */
+    color: var(--navbar-user-text-color); /* Highlights the logged-in player with a navbar-specific color. */
     font-size: 0.8rem; /* Keeps the player name compact inside the navbar. */
 }
 
@@ -105,9 +139,9 @@ button.nes-btn.nes-pointer:active {
 }
 
 .app-footer {
-    background: #181825;
-    border-top: 4px solid #171720;
-    color: #88889a;
+    background: var(--primary-color);
+    border-top: 4px solid var(--border-color);
+    color: var(--footer-text-color);
     font-size: 0.65rem;
     min-height: 56px;
 }

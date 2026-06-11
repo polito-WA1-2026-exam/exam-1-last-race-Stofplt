@@ -72,7 +72,7 @@
 
 .planning-timer,
 .planning-coins {
-    background: #ffffff; /* Uses a white NES panel rather than Bootstrap status boxes. */
+    background: var(--surface-color); /* Uses a white NES panel rather than Bootstrap status boxes. */
     box-sizing: border-box; /* Keeps the icon boxes the same outer height. */
     height: var(
         --planning-status-box-height
@@ -105,11 +105,9 @@
 
 /* Planning station-only map: custom SVG styling is necessary because Bootstrap cannot style SVG internals. */
 .planning-map-panel {
-    --planning-map-bg: #1f1f1f; /* Reuses the dark map background from the setup map. */
-    --planning-map-grid: rgb(
-        255 255 255 / 4%
-    ); /* Creates a subtle pixel grid over the map. */
-    --planning-map-text: #f7f7f2; /* Gives labels a shared off-white color. */
+    --planning-map-bg: var(--map-background-color); /* Reuses the dark map background from the setup map. */
+    --planning-map-grid: var(--map-grid-color); /* Creates a subtle pixel grid over the map. */
+    --planning-map-text: var(--map-text-color); /* Gives labels a shared off-white color. */
     aspect-ratio: 7 / 5; /* Matches the setup map shape. */
     background:
         linear-gradient(var(--planning-map-grid) 1px, transparent 1px),
@@ -137,18 +135,18 @@
 }
 
 .planning-map-station {
-    fill: #f7f7f2; /* Gives ordinary stations a visible light marker. */
+    fill: var(--map-text-color); /* Gives ordinary stations a visible light marker. */
     shape-rendering: crispEdges; /* Keeps station squares pixel-sharp. */
-    stroke: #171720; /* Adds dark outline against the map background. */
+    stroke: var(--border-color); /* Adds dark outline against the map background. */
     stroke-width: 2px; /* Keeps station outline readable at map scale. */
 }
 
 .planning-map-station.is-start {
-    fill: #92cc41; /* Marks start station with NES success green. */
+    fill: #92cc41; /* Keeps start station on the standard NES green, independent from the palette. */
 }
 
 .planning-map-station.is-destination {
-    fill: #e76e55; /* Marks destination station with NES error red. */
+    fill: #e76e55; /* Keeps destination station on the standard NES red, independent from the palette. */
 }
 
 .planning-map-label,
@@ -158,7 +156,7 @@
     letter-spacing: 0; /* Avoids distorted pixel-font spacing. */
     paint-order: stroke fill; /* Draws outline behind text for map readability. */
     pointer-events: none; /* Keeps labels from blocking marker interactions. */
-    stroke: rgb(31 31 31 / 75%); /* Creates a dark halo around light labels. */
+    stroke: var(--map-label-outline-color); /* Creates a dark halo around light labels. */
     user-select: none; /* Prevents accidental text selection inside the map. */
 }
 
@@ -174,16 +172,16 @@
 }
 
 .planning-map-tag.is-start {
-    fill: #92cc41; /* Matches the start station marker. */
+    fill: #92cc41; /* Matches the fixed start station marker. */
 }
 
 .planning-map-tag.is-destination {
-    fill: #e76e55; /* Matches the destination station marker. */
+    fill: #e76e55; /* Matches the fixed destination station marker. */
 }
 
 /* Segment chooser requires custom CSS because NES buttons do not compose cleanly in Bootstrap button groups. */
 .planning-segment-container {
-    background: #ffffff; /* Gives the segment list a white NES panel. */
+    background: var(--surface-color); /* Gives the segment list a white NES panel. */
     box-sizing: border-box; /* Includes padding inside the fixed-height Planning column. */
     flex: 0 0 auto; /* Lets the left column expand naturally so the page itself can scroll. */
     overflow: hidden; /* Keeps the NES border and inner padding clipped cleanly. */
@@ -227,6 +225,7 @@
 
 .segment-toggle-button {
     align-items: center; /* Vertically centers route text. */
+    background-color: var(--available-segment-background-color);
     color: inherit; /* Allows selected NES color class to control foreground. */
     display: flex; /* Centers wrapped text inside the button. */
     font-size: 0.72rem; /* Keeps long station names fitting inside segment buttons. */
@@ -247,8 +246,36 @@
     word-break: normal; /* Keeps readable word wrapping. */
 }
 
+.segment-control-group:not(.is-selected) .segment-toggle-button,
+.segment-control-group:not(.is-selected) .segment-toggle-button:hover,
+.segment-control-group:not(.is-selected) .segment-toggle-button:focus,
+.segment-control-group:not(.is-selected) .segment-switch-button,
+.segment-control-group:not(.is-selected) .segment-switch-button:hover,
+.segment-control-group:not(.is-selected) .segment-switch-button:focus {
+    background-color: var(--available-segment-background-color);
+}
+
+.segment-control-group.is-selected .segment-toggle-button.is-primary,
+.segment-control-group.is-selected .segment-toggle-button.is-primary:hover,
+.segment-control-group.is-selected .segment-toggle-button.is-primary:focus {
+    background-color: var(--selected-segment-background-color);
+    color: var(--selected-segment-text-color);
+}
+
+.segment-control-group.is-selected .segment-toggle-button.is-primary::after,
+.segment-control-group.is-selected
+    .segment-toggle-button.is-primary:hover::after {
+    box-shadow: inset -4px -4px var(--selected-segment-shadow-color);
+}
+
+.segment-control-group.is-selected
+    .segment-toggle-button.is-primary:active:not(.is-disabled)::after {
+    box-shadow: inset 4px 4px var(--selected-segment-shadow-color);
+}
+
 .segment-switch-button {
     align-items: center; /* Centers the pixel swap icon vertically. */
+    background-color: var(--available-segment-background-color);
     border-left-width: 0; /* Removes duplicate border where the two NES buttons touch. */
     display: inline-flex; /* Keeps the icon centered without extra wrappers. */
     justify-content: center; /* Centers the pixel swap icon horizontally. */
@@ -259,7 +286,7 @@
 }
 
 .segment-control-group.is-selected .segment-switch-button {
-    color: #171720; /* Keeps the switch icon dark even when the route button is selected blue. */
+    color: var(--text-color); /* Keeps the switch icon dark even when the route button is selected blue. */
 }
 
 .pixel-swap-icon {
@@ -314,7 +341,7 @@
 
 /* Route builder needs custom grid rows so the action buttons stay at the bottom of the NES panel. */
 .route-builder {
-    background: #ffffff; /* Keeps selected-route panel white inside NES border. */
+    background: var(--surface-color); /* Keeps selected-route panel white inside NES border. */
     box-sizing: border-box; /* Includes padding inside the full-height sidebar. */
     display: grid; /* Creates route-list and action-button rows. */
     gap: var(--planning-gap, 1rem); /* Matches Planning panel spacing. */
@@ -329,7 +356,7 @@
 }
 
 .empty-route {
-    color: #66665f; /* Shows empty state as secondary text without Bootstrap dependency. */
+    color: var(--muted-text-color); /* Shows empty state as secondary text without Bootstrap dependency. */
 }
 
 .empty-route p {
@@ -345,12 +372,12 @@
     min-height: 0; /* Allows internal scrolling in the route panel. */
     overflow-y: auto; /* Lets long selected routes scroll inside the panel. */
     padding: 0 0.35rem 0 0; /* Leaves room beside the scrollbar. */
-    scrollbar-color: #171720 #fffdf2; /* Styles Firefox scrollbar consistently with segment list. */
+    scrollbar-color: var(--border-color) var(--surface-alt-color); /* Styles Firefox scrollbar consistently with segment list. */
     scrollbar-width: auto; /* Keeps Firefox scrollbar usable. */
 }
 
 .route-step-item {
-    background: #fffdf2; /* Gives route steps a warm panel fill. */
+    background: var(--surface-alt-color); /* Gives route steps a warm panel fill. */
     font-size: 0.72rem; /* Keeps long station names fitting in the sidebar. */
     gap: 0.75rem; /* Spaces index, route text, and remove button. */
     grid-template-columns: auto minmax(0, 1fr) auto; /* Keeps remove button fixed while text wraps. */
@@ -359,7 +386,7 @@
 }
 
 .route-step-index {
-    color: #66665f; /* Makes step number secondary to the station names. */
+    color: var(--muted-text-color); /* Makes step number secondary to the station names. */
 }
 
 .route-step-content {

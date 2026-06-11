@@ -77,7 +77,10 @@ function ExecutionMap({
 
       if (!isInterchange && lineIds.size === 1) {
         const [lineId] = lineIds;
-        point.setAttribute("stroke", lineById.get(lineId)?.color ?? "#f7f7f2");
+        point.setAttribute(
+          "stroke",
+          lineById.get(lineId)?.color ?? "var(--map-text-color)",
+        );
       }
 
       const text = svgEl("text", {
@@ -116,7 +119,7 @@ function ExecutionMap({
 
           const shadowPixel = svgEl("rect", {
             class: "metro-pixel-shadow",
-            fill: "#000000",
+            fill: "var(--map-pixel-shadow-color)",
             height: PIXEL_SIZE,
             width: PIXEL_SIZE,
             x: point.x - PIXEL_SIZE / 2 + SHADOW_OFFSET,

@@ -3,6 +3,7 @@
 }
 
 .home-rule-card {
+    background: var(--instruction-card-background-color);
     min-height: 390px;
     overflow: hidden;
     padding: 1.5rem;
@@ -21,8 +22,8 @@
 }
 
 .home-rule-number {
-    background: #2563eb;
-    color: #ffffff;
+    background: var(--instruction-number-background-color);
+    color: var(--text-color);
     height: 2.25rem;
     position: relative;
     width: 2.25rem;
@@ -35,7 +36,7 @@
 }
 
 .home-rule-card p {
-    color: #555560;
+    color: var(--muted-text-color);
     font-size: 0.62rem;
     line-height: 1.9;
 }
@@ -69,7 +70,7 @@
 }
 
 .home-rule-icon {
-    --icon-color: #171720;
+    --icon-color: var(--text-color);
     --pixel: 10px;
     display: block;
     height: 110px;
