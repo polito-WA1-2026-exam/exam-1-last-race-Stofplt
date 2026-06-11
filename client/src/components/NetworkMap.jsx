@@ -131,16 +131,35 @@ function NetworkMap({ lines = [], segments = [], stations = [] }) {
         );
       }
 
+      const labelX = station.x + LABEL_OFFSET_X;
+      const labelY =
+        station.y + (labelOffsetByStation.get(station.id) ?? LABEL_LOWER_Y);
+      const labelBaseTransform = `translate(${labelX} ${labelY})`;
+      const labelHoverTransform = `${labelBaseTransform} scale(1.8)`;
+      const labelAnchor = svgEl("g", {
+        class: "label-anchor",
+        transform: labelBaseTransform
+      });
+      const showLabelHover = () =>
+        labelAnchor.setAttribute("transform", labelHoverTransform);
+      const hideLabelHover = () =>
+        labelAnchor.setAttribute("transform", labelBaseTransform);
+
+      marker.addEventListener("mouseenter", showLabelHover);
+      marker.addEventListener("mouseleave", hideLabelHover);
+      marker.addEventListener("focus", showLabelHover);
+      marker.addEventListener("blur", hideLabelHover);
       const text = svgEl("text", {
         class: "label",
-        x: station.x + LABEL_OFFSET_X,
-        y: station.y + (labelOffsetByStation.get(station.id) ?? LABEL_LOWER_Y),
+        x: 0,
+        y: 0,
         "dominant-baseline": "middle",
         "text-anchor": "start"
       });
 
       text.textContent = station.name;
-      marker.append(point, text);
+      labelAnchor.appendChild(text);
+      marker.append(point, labelAnchor);
       annotationLayer.appendChild(marker);
       state.annotations.push({ element: marker, stationId: station.id });
     }
