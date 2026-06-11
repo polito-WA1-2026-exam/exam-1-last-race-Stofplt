@@ -236,7 +236,7 @@ function PlanningPage() {
   return (
     <section className="planning-page container-fluid py-4">
       <div className="d-flex align-items-center justify-content-between gap-3 mb-3">
-        <h1>Planning</h1>
+        <h1 className="mb-0">Planning</h1>
       </div>
 
       <div className="planning-board">
@@ -250,7 +250,7 @@ function PlanningPage() {
             />
           </div>
           <div className="planning-labeled-block">
-            <h2 className="planning-panel-heading m-0">Available segments</h2>
+            <h2 className="planning-panel-heading mt-4">Available segments</h2>
             <SegmentList
               onSwitchSelected={switchSelectedDirection}
               onToggle={toggleSegment}
@@ -283,15 +283,17 @@ function PlanningPage() {
               </div>
             </div>
           </div>
-          <h2 className="planning-panel-heading m-0">Selected route</h2>
-          <RouteBuilder
-            onClear={clearRoute}
-            onRemoveSegment={removeSelectedSegment}
-            onSubmit={() => submitSelectedRoute(selectedSegmentIds)}
-            segments={selectedSegments}
-            stations={network.stations}
-            submitting={submitting}
-          />
+          <div className="planning-labeled-block planning-route-block mt-4">
+            <h2 className="planning-panel-heading m-0">Selected route</h2>
+            <RouteBuilder
+              onClear={clearRoute}
+              onRemoveSegment={removeSelectedSegment}
+              onSubmit={() => submitSelectedRoute(selectedSegmentIds)}
+              segments={selectedSegments}
+              stations={network.stations}
+              submitting={submitting}
+            />
+          </div>
         </aside>
       </div>
     </section>

@@ -35,7 +35,7 @@
         100dvh - var(--navbar-height) - var(--app-content-padding-block) -
             var(--footer-height)
     ); /* Locks the sticky rail to viewport height so the route builder fills remaining space. */
-    overflow: hidden; /* Forces the route builder to be the scroll container. */
+    overflow: visible; /* Lets NES borders and button shadows render beyond the rail box. */
     position: sticky; /* Pins the right rail while the page scrolls. */
     top: 1rem; /* Keeps the rail offset from the top edge during scroll. */
     width: 100%; /* Fills the fixed grid column so status and Selected route share the same edges. */
@@ -51,6 +51,12 @@
     gap: var(
         --planning-label-gap
     ); /* Aligns container top borders across Map, Timer, and Coins. */
+}
+
+.planning-route-block {
+    flex: 1 1 auto; /* Lets the selected-route panel keep filling the sticky rail. */
+    grid-template-rows: auto minmax(0, 1fr); /* Keeps the label tight while the builder owns remaining height. */
+    min-height: 0; /* Allows the route builder to remain the scroll container. */
 }
 
 .planning-status-row {
@@ -315,7 +321,7 @@
     grid-template-rows: minmax(0, 1fr) auto; /* Lets selected route scroll while actions stay fixed. */
     flex: 1 1 auto; /* Fills the remaining space in the sticky right rail. */
     min-height: 0; /* Allows route steps to scroll internally. */
-    overflow: hidden; /* Keeps route list and actions inside the NES frame. */
+    overflow: visible; /* Keeps NES button shadows from being clipped at the panel bottom. */
     padding: var(
         --planning-inner-padding,
         0.85rem

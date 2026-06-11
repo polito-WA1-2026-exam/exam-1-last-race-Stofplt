@@ -15,11 +15,11 @@ function AppNavbar() {
 
   return (
     <>
-      <header className="app-navbar d-flex align-items-center gap-3 px-4 py-3">
+      <header className="app-navbar d-flex align-items-center gap-4 px-4 py-3">
         <Link className="brand-link nes-pointer text-decoration-none" to="/">
-          Last Race
+          LastRace
         </Link>
-        <nav className="d-flex align-items-center gap-3 flex-grow-1">
+        <nav className="d-flex align-items-center gap-3 flex-grow-1 ms-4">
           <Link
             className="nav-link-pixel nes-pointer text-decoration-none"
             to="/ranking"
