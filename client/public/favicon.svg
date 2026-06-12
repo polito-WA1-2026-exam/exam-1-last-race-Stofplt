@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="100%" height="100%" shape-rendering="crispEdges">
+  <!-- Sfondo trasparente -->
+  
+  <!-- Contorni e Finestrini (Grigio Scuro) -->
+  <path fill="#2b2b2b" d="M4,1 h8 v1 h1 v1 h1 v5 h-1 v3 h-1 v1 h-8 v-1 h-1 v-3 h-1 v-5 h1 v-1 h1 v-1 z M3,12 h1 v1 h-1 z M12,12 h1 v1 h-1 z M2,13 h3 v1 h-3 z M11,13 h3 v1 h-3 z M4,4 h8 v4 h-8 z M7,9 h2 v2 h-2 z" />
+
+  <!-- Colore Principale Metro (#f4828c) -->
+  <path fill="#f4828c" d="M5,2 h6 v1 h-6 z M4,3 h8 v1 h-8 z M3,8 h1 v3 h1 v1 h2 v-2 h2 v2 h2 v-1 h1 v-3 h1 v-1 h-10 z" />
+
+  <!-- Fari e Riflesso sul vetro (Bianco) -->
+  <path fill="#ffffff" d="M4,9 h1 v1 h-1 z M11,9 h1 v1 h-1 z M5,5 h2 v1 h-2 z M5,6 h1 v1 h-1 z" />
+</svg>

@@ -3,7 +3,7 @@ const PLANNING_TIME_LIMIT_MS = 90_000;
 // ┌─────────────────────────────────────────────────────────┐
 // │ DEBUG: metti a true per avere sempre la stessa tratta. │
 // └─────────────────────────────────────────────────────────┘
-const DEBUG_FIXED_ROUTE = true;
+const DEBUG_FIXED_ROUTE = false;
 const FIXED_START_ID = 1; // Shady Grove
 const FIXED_DEST_ID = 10; // Waterfront
 

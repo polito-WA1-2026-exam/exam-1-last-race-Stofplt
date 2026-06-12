@@ -14,14 +14,6 @@ async function requestJson(path, options = {}) {
   return await response.json();
 }
 
-async function getHealth() {
-  return await requestJson("/health");
-}
-
-async function getInstructions() {
-  return await requestJson("/instructions");
-}
-
 async function getNetwork() {
   return await requestJson("/network/full");
 }
@@ -81,8 +73,6 @@ export {
   getExecutionNetwork,
   getExecutionState,
   getGameResult,
-  getHealth,
-  getInstructions,
   getNetwork,
   getNetworkStations,
   getPlanningNetwork,
