@@ -1,0 +1,145 @@
+/* Global app constants used where Bootstrap utilities cannot know the navbar height. */
+html {
+    /* App color palette: edit these values to test themes. */
+    --primary-color: #f4828c;
+    --background-color: #fff8e7;
+    --surface-color: #f7ead0;
+    --surface-alt-color: #f4c7a1;
+    --instruction-card-background-color: #fff8e7;
+    --instruction-number-background-color: #f4828c;
+    --login-panel-background-color: #fff8e7;
+    --ranking-table-background-color: #fff8e7;
+    --border-color: #171720;
+    --shadow-color: #9f7d58;
+    --success-color: #4aa52e;
+    --danger-color: #d64045;
+    --map-background-color: var(--instruction-card-background-color);
+    --map-text-color: #171720;
+    --map-grid-color: rgb(23 23 32 / 6%);
+    --map-label-outline-color: rgb(255 248 231 / 82%);
+    --map-pixel-outline-color: rgb(23 23 32 / 58%);
+    --map-pixel-shadow-color: #171720;
+    --overlay-color: rgb(23 23 32 / 72%);
+    --subtle-border-color: #d7b98f;
+    --subtle-divider-color: #e5caa5;
+    --selected-segment-background-color: #f4828c;
+    --selected-segment-shadow-color: #84454b;
+    --selected-segment-text-color: #171720;
+    --available-segment-background-color: #fff8e7;
+    --text-color: #171720;
+    --text-inverted-color: #171720;
+    --muted-text-color: #5f6470;
+    --footer-text-color: #171720;
+    --navbar-hover-text-color: #fff8e7;
+    --navbar-user-text-color: #fff8e7;
+    --app-content-padding: 2rem; /* Keeps the outer app spacing in one reusable value. */
+    --app-content-padding-block: 4rem; /* Lets Planning subtract top and bottom app padding from viewport height. */
+    --navbar-height: 88px; /* Matches the fixed visual height of the custom NES navbar. */
+    --footer-height: 56px; /* Matches the footer min-height for viewport calculations. */
+    --nes-cursor-pointer:
+        url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAzElEQVRYR+2X0Q6AIAhF5f8/2jYXZkwEjNSVvVUjDpcrGgT7FUkI2D9xRfQETwNIiWO85wfINfQUEyxBG2ArsLwC0jioGt5zFcwF4OYDPi/mBYKm4t0U8ATgRm3ThFoAqkhNgWkA0jJLvaOVSs7j3qMnSgXWBMiWPXe94QqMBMBc1VZIvaTu5u5pQewq0EqNZvIEMCmxAawK0DNkay9QmfFNAJUXfgGgUkLaE7j/h8fnASkxHTz0DGIBMCnBeeM7AArpUd3mz2x3C7wADglA8BcWMZhZAAAAAElFTkSuQmCC)
+            14 0,
+        pointer; /* Reuses NES pointer cursor even on custom buttons. */
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh; /* Fallback for browsers without dynamic viewport units. */
+    min-height: 100dvh; /* Uses the actually visible viewport on modern browsers. */
+    background: var(--background-color); /* Defines the page background because Bootstrap theme colors do not match the game palette. */
+    color: var(--text-color); /* Sets the app text color to match the NES-inspired dark ink. */
+    font-family:
+        "Press Start 2P", system-ui, sans-serif; /* Applies the project font globally instead of repeating it per component. */
+}
+
+#root {
+    display: flex;
+    flex: 1 0 auto;
+    flex-direction: column;
+}
+
+main {
+    flex: 1 0 auto;
+}
+
+button,
+input {
+    font-family: inherit; /* Forces native form controls to use the pixel font consistently. */
+}
+
+button.nes-btn.nes-pointer,
+button.nes-btn.nes-pointer:hover,
+button.nes-btn.nes-pointer:focus,
+button.nes-btn.nes-pointer:active {
+    cursor: var(
+        --nes-cursor-pointer
+    ) !important; /* Overrides NES/Bootstrap cursor conflicts for clickable controls. */
+}
+
+.nes-container.is-rounded {
+    border-image-repeat: stretch; /* Prevents segmented NES borders caused by browser-specific NES.css defaults. */
+}
+
+.nes-btn {
+    border-image-repeat: stretch; /* Prevents segmented NES borders caused by browser-specific NES.css defaults. */
+}
+
+.app-content {
+    box-sizing: border-box; /* Includes padding in viewport-height calculations. */
+    padding: var(
+        --app-content-padding
+    ); /* Centralizes page padding rather than repeating Bootstrap spacing everywhere. */
+}
+
+.page-loader {
+    min-height: 220px; /* Prevents loading states from collapsing into tiny rows. */
+}
+
+/* Navbar colors and sizes are custom because Bootstrap navbars do not match the NES game header. */
+.app-navbar {
+    background: var(--primary-color); /* Provides the dark game header background. */
+    border-bottom: 4px solid var(--border-color); /* Adds the pixel-thick separation from page content. */
+    min-height: var(
+        --navbar-height
+    ); /* Keeps content height calculations synchronized with the visual navbar. */
+}
+
+.brand-link,
+.nav-link-pixel {
+    color: var(--text-inverted-color); /* Keeps nav links white on the dark custom navbar. */
+}
+
+.brand-link {
+    font-size: 1.15rem; /* Makes the game title larger than secondary nav links. */
+}
+
+.brand-link:hover,
+.nav-link-pixel:hover {
+    color: var(--navbar-hover-text-color); /* Keeps navbar hover text legible on the active theme color. */
+}
+
+.user-name {
+    color: var(--navbar-user-text-color); /* Highlights the logged-in player with a navbar-specific color. */
+    font-size: 0.8rem; /* Keeps the player name compact inside the navbar. */
+}
+
+.logout-button {
+    height: 42px; /* Gives the icon button a stable NES-sized square hit area. */
+    padding: 0.35rem; /* Centers the inline SVG without relying on default NES padding. */
+    width: 42px; /* Matches height so the logout button remains square. */
+}
+
+.logout-button svg {
+    fill: currentColor; /* Lets the SVG inherit NES button foreground color. */
+    height: 22px; /* Keeps the icon visually centered inside the 42px button. */
+    width: 22px; /* Keeps the icon square and balanced. */
+}
+
+.app-footer {
+    background: var(--primary-color);
+    border-top: 4px solid var(--border-color);
+    color: var(--footer-text-color);
+    font-size: 0.65rem;
+    min-height: 56px;
+}

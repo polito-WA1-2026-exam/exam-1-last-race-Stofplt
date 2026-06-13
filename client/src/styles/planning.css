@@ -1,0 +1,424 @@
+/* Planning keeps only the custom pieces Bootstrap cannot cover: sticky sidebar, map frame, and scrollable panels. */
+.planning-page {
+    --planning-gap: 1rem; /* Shares one spacing value between Planning CSS pieces. */
+    --planning-inner-padding: 0.85rem; /* Keeps NES panels internally consistent. */
+    --planning-label-gap: 0.3rem; /* Keeps every label-to-container distance identical. */
+    --planning-right-rail-width: 520px; /* Keeps status and selected-route right edges aligned. */
+    --planning-status-box-height: 72px; /* Makes Timer and Coins containers exactly equal height. */
+    --planning-coins-width: 156px; /* Gives Coins a stable final column width. */
+}
+
+.planning-board {
+    align-items: start; /* Keeps Map, Timer, and Coins label rows starting at the same height. */
+    display: grid; /* Makes the left and right Planning columns deterministic. */
+    gap: 1.5rem; /* Matches the previous Bootstrap g-4 spacing. */
+    grid-template-columns: minmax(0, 1fr) var(--planning-right-rail-width); /* Gives the right rail a fixed edge for Coins and Selected route. */
+}
+
+.planning-segments-panel {
+    display: flex; /* Lets the left column stack the map, title, and list with Bootstrap spacing. */
+    flex-direction: column; /* Keeps the left column vertical. */
+    gap: var(
+        --planning-gap
+    ); /* Matches the Bootstrap gutter rhythm used in the page. */
+    min-height: 0; /* Allows the segment list to shrink and scroll. */
+    width: 100%; /* Makes Map and Available segments share the full left column width. */
+}
+
+.planning-route-panel {
+    display: flex; /* Lets the right column behave like a vertical stack. */
+    flex-direction: column; /* Keeps timer, coins, title, and builder one above the other. */
+    gap: var(
+        --planning-gap
+    ); /* Keeps the right rail spaced with a fixed rhythm. */
+    height: calc(
+        100dvh - var(--navbar-height) - var(--app-content-padding-block) -
+            var(--footer-height)
+    ); /* Locks the sticky rail to viewport height so the route builder fills remaining space. */
+    overflow: visible; /* Lets NES borders and button shadows render beyond the rail box. */
+    position: sticky; /* Pins the right rail while the page scrolls. */
+    top: 1rem; /* Keeps the rail offset from the top edge during scroll. */
+    width: 100%; /* Fills the fixed grid column so status and Selected route share the same edges. */
+}
+
+.planning-panel-heading {
+    font-size: 0.95rem; /* Keeps headings compact inside the dense Planning screen. */
+    line-height: 1.2; /* Gives all labels the same measurable text height. */
+}
+
+.planning-labeled-block {
+    display: grid; /* Gives labels and their containers a shared vertical structure. */
+    gap: var(
+        --planning-label-gap
+    ); /* Aligns container top borders across Map, Timer, and Coins. */
+}
+
+.planning-route-block {
+    flex: 1 1 auto; /* Lets the selected-route panel keep filling the sticky rail. */
+    grid-template-rows: auto minmax(0, 1fr); /* Keeps the label tight while the builder owns remaining height. */
+    min-height: 0; /* Allows the route builder to remain the scroll container. */
+}
+
+.planning-status-row {
+    display: grid; /* Places Timer and Coins in one measurable row. */
+    gap: var(--planning-gap); /* Matches the Bootstrap column gutter rhythm. */
+    grid-template-columns: minmax(0, 1fr) var(--planning-coins-width); /* Lets Timer expand while Coins stays flush right. */
+    width: 100%; /* Lets the status row stretch to the full width of the right rail. */
+}
+
+.planning-status-block {
+    min-width: 0; /* Allows the timer block to shrink and absorb remaining horizontal space. */
+}
+
+.planning-timer,
+.planning-coins {
+    background: var(--surface-color); /* Uses a white NES panel rather than Bootstrap status boxes. */
+    box-sizing: border-box; /* Keeps the icon boxes the same outer height. */
+    height: var(
+        --planning-status-box-height
+    ); /* Makes Timer and Coins exactly the same height. */
+    min-height: 0; /* Prevents NES defaults from overriding the explicit status height. */
+    padding: var(
+        --planning-inner-padding
+    ); /* Matches other Planning NES containers. */
+}
+
+.planning-timer {
+    min-width: 0; /* Allows the timer to keep growing instead of forcing the rail wider. */
+    width: 100%; /* Fills the timer grid cell edge to edge. */
+}
+
+.planning-coins {
+    min-width: 0; /* Lets the grid column define the coin box width. */
+}
+
+.planning-timer .nes-progress {
+    height: 32px; /* Keeps the NES progress bar readable inside the compact status box. */
+    margin: 0; /* Removes NES default margin that misaligns the timer row. */
+    width: 100%; /* Lets the progress bar use the available timer width. */
+}
+
+.planning-timer span {
+    min-width: 4ch; /* Prevents the seconds label from resizing the timer row. */
+    text-align: right; /* Aligns countdown digits consistently. */
+}
+
+/* Planning station-only map: custom SVG styling is necessary because Bootstrap cannot style SVG internals. */
+.planning-map-panel {
+    --planning-map-bg: var(--map-background-color); /* Reuses the dark map background from the setup map. */
+    --planning-map-grid: var(--map-grid-color); /* Creates a subtle pixel grid over the map. */
+    --planning-map-text: var(--map-text-color); /* Gives labels a shared off-white color. */
+    aspect-ratio: 7 / 5; /* Matches the setup map shape. */
+    background:
+        linear-gradient(var(--planning-map-grid) 1px, transparent 1px),
+        linear-gradient(90deg, var(--planning-map-grid) 1px, transparent 1px),
+        var(--planning-map-bg); /* Draws the pixel grid without extra markup. */
+    background-size: 8px 8px; /* Matches the pixel grid size used on the setup map. */
+    border: none; /* Removes the 4px NES container border so the map fits the grid column. */
+    box-sizing: border-box; /* Keeps NES borders inside expected dimensions. */
+    height: min(
+        64vh,
+        580px
+    ); /* Keeps the Planning map readable without affecting top alignment. */
+    margin: 0 !important; /* Removes any inherited NES container margin. */
+    min-height: 460px; /* Keeps station labels readable on desktop. */
+    overflow: hidden; /* Clips SVG to the NES frame. */
+    padding: 0; /* Lets the SVG fill the map panel exactly. */
+    width: 100%; /* Matches the Available segments container width. */
+}
+
+.planning-map,
+.metro-map {
+    display: block; /* Removes inline SVG whitespace. */
+    height: 100%; /* Makes SVG fill its panel height. */
+    width: 100%; /* Makes SVG fill its panel width. */
+}
+
+.planning-map-station {
+    fill: var(--map-text-color); /* Gives ordinary stations a visible light marker. */
+    shape-rendering: crispEdges; /* Keeps station squares pixel-sharp. */
+    stroke: var(--border-color); /* Adds dark outline against the map background. */
+    stroke-width: 2px; /* Keeps station outline readable at map scale. */
+}
+
+.planning-map-station.is-start {
+    fill: #92cc41; /* Keeps start station on the standard NES green, independent from the palette. */
+}
+
+.planning-map-station.is-destination {
+    fill: #e76e55; /* Keeps destination station on the standard NES red, independent from the palette. */
+}
+
+.planning-map-label,
+.planning-map-tag {
+    font-family:
+        "Press Start 2P", "Courier New", monospace; /* Keeps SVG text consistent with app font. */
+    letter-spacing: 0; /* Avoids distorted pixel-font spacing. */
+    paint-order: stroke fill; /* Draws outline behind text for map readability. */
+    pointer-events: none; /* Keeps labels from blocking marker interactions. */
+    stroke: var(--map-label-outline-color); /* Creates a dark halo around light labels. */
+    user-select: none; /* Prevents accidental text selection inside the map. */
+}
+
+.planning-map-label {
+    fill: var(--planning-map-text); /* Uses the shared map label color. */
+    font-size: 7px; /* Keeps station labels readable in the full-size map. */
+    stroke-width: 2.5px; /* Matches setup-map label outline thickness. */
+}
+
+.planning-map-tag {
+    font-size: 6px; /* Keeps START/FINISH secondary to station names. */
+    stroke-width: 2.5px; /* Keeps tag text readable on the dark grid. */
+}
+
+.planning-map-tag.is-start {
+    fill: #92cc41; /* Matches the fixed start station marker. */
+}
+
+.planning-map-tag.is-destination {
+    fill: #e76e55; /* Matches the fixed destination station marker. */
+}
+
+/* Segment chooser requires custom CSS because NES buttons do not compose cleanly in Bootstrap button groups. */
+.planning-segment-container {
+    background: var(--surface-color); /* Gives the segment list a white NES panel. */
+    box-sizing: border-box; /* Includes padding inside the fixed-height Planning column. */
+    flex: 0 0 auto; /* Lets the left column expand naturally so the page itself can scroll. */
+    overflow: hidden; /* Keeps the NES border and inner padding clipped cleanly. */
+    padding: var(
+        --planning-inner-padding
+    ); /* Matches the status/route panel padding. */
+}
+
+.planning-segment-grid {
+    align-content: start; /* Prevents grid rows from stretching vertically. */
+    align-items: start; /* Keeps segment buttons their natural height. */
+    display: grid; /* Allows auto-fitting multiple segment columns. */
+    gap: var(--planning-gap); /* Keeps segment buttons evenly spaced. */
+    grid-auto-rows: max-content; /* Prevents buttons from stretching to fill the panel. */
+    grid-template-columns: repeat(
+        auto-fit,
+        minmax(min(320px, 100%), 1fr)
+    ); /* Gives responsive columns without media-specific JSX. */
+    min-height: 0; /* Keeps the grid from imposing extra height on the page. */
+    overflow-x: hidden; /* Prevents NES border outsets from creating horizontal scroll. */
+    padding: 4px calc(0.35rem + 4px) calc(0.35rem + 8px) 4px; /* Leaves room for NES border-image outsets. */
+}
+
+.segment-control-group {
+    display: grid; /* Keeps route button and swap button in one row. */
+    grid-template-columns: minmax(0, 1fr) auto; /* Lets the route label fill remaining width. */
+    line-height: 1.5; /* Improves readability for wrapped station names. */
+    min-height: 64px; /* Keeps every segment control touch-friendly. */
+    text-align: center; /* Centers wrapped station names inside the NES button. */
+    transform: translateZ(
+        0
+    ); /* Avoids subpixel rendering gaps between adjacent NES buttons. */
+    width: 100%; /* Makes the control fill its grid column. */
+}
+
+.segment-control-group .nes-btn {
+    background-clip: border-box; /* Avoids white seams around NES border-image edges. */
+    image-rendering: pixelated; /* Keeps button border rendering sharp. */
+    margin: 0; /* Removes NES default margins so the two buttons touch. */
+}
+
+.segment-toggle-button {
+    align-items: center; /* Vertically centers route text. */
+    background-color: var(--available-segment-background-color);
+    color: inherit; /* Allows selected NES color class to control foreground. */
+    display: flex; /* Centers wrapped text inside the button. */
+    font-size: 0.72rem; /* Keeps long station names fitting inside segment buttons. */
+    justify-content: center; /* Horizontally centers route text. */
+    line-height: 1.55; /* Gives wrapped station names breathing room. */
+    min-height: 64px; /* Matches the swap button height. */
+    padding: 0.55rem 0.75rem; /* Keeps text away from NES borders. */
+    white-space: normal; /* Allows station names to wrap. */
+    width: 100%; /* Makes the route button fill the available column. */
+    word-break: normal; /* Avoids breaking station names into unnatural chunks. */
+    z-index: 2; /* Keeps the route button border visible beside the swap button. */
+}
+
+.segment-toggle-button span,
+.route-step-content span {
+    min-width: 0; /* Allows text wrappers to shrink inside CSS grid columns. */
+    overflow-wrap: break-word; /* Prevents long station names from overflowing cards. */
+    word-break: normal; /* Keeps readable word wrapping. */
+}
+
+.segment-control-group:not(.is-selected) .segment-toggle-button,
+.segment-control-group:not(.is-selected) .segment-toggle-button:hover,
+.segment-control-group:not(.is-selected) .segment-toggle-button:focus,
+.segment-control-group:not(.is-selected) .segment-switch-button,
+.segment-control-group:not(.is-selected) .segment-switch-button:hover,
+.segment-control-group:not(.is-selected) .segment-switch-button:focus {
+    background-color: var(--available-segment-background-color);
+}
+
+.segment-control-group.is-selected .segment-toggle-button.is-primary,
+.segment-control-group.is-selected .segment-toggle-button.is-primary:hover,
+.segment-control-group.is-selected .segment-toggle-button.is-primary:focus {
+    background-color: var(--selected-segment-background-color);
+    color: var(--selected-segment-text-color);
+}
+
+.segment-control-group.is-selected .segment-toggle-button.is-primary::after,
+.segment-control-group.is-selected
+    .segment-toggle-button.is-primary:hover::after {
+    box-shadow: inset -4px -4px var(--selected-segment-shadow-color);
+}
+
+.segment-control-group.is-selected
+    .segment-toggle-button.is-primary:active:not(.is-disabled)::after {
+    box-shadow: inset 4px 4px var(--selected-segment-shadow-color);
+}
+
+.segment-switch-button {
+    align-items: center; /* Centers the pixel swap icon vertically. */
+    background-color: var(--available-segment-background-color);
+    border-left-width: 0; /* Removes duplicate border where the two NES buttons touch. */
+    display: inline-flex; /* Keeps the icon centered without extra wrappers. */
+    justify-content: center; /* Centers the pixel swap icon horizontally. */
+    min-height: 64px; /* Matches the route button height. */
+    min-width: 68px; /* Gives the swap icon a stable hit area. */
+    padding-inline: 0.45rem; /* Keeps icon away from NES borders. */
+    z-index: 1; /* Places the switch behind the route button edge to avoid border seams. */
+}
+
+.segment-control-group.is-selected .segment-switch-button {
+    color: var(--text-color); /* Keeps the switch icon dark even when the route button is selected blue. */
+}
+
+.pixel-swap-icon {
+    display: inline-grid; /* Stacks the two CSS arrows without image assets. */
+    gap: 4px; /* Separates the two arrows clearly. */
+    width: 28px; /* Gives the icon a stable button footprint. */
+}
+
+.swap-arrow {
+    display: block; /* Allows pseudo-elements to draw each arrow. */
+    height: 6px; /* Sets the arrow shaft area. */
+    image-rendering: pixelated; /* Keeps the CSS icon sharp. */
+    position: relative; /* Anchors arrowhead pseudo-elements. */
+}
+
+.swap-arrow::before,
+.swap-arrow::after {
+    content: ""; /* Creates drawable CSS arrow pieces. */
+    display: block; /* Lets pseudo-elements take dimensions. */
+    position: absolute; /* Places shafts and heads precisely. */
+}
+
+.swap-arrow-top::before,
+.swap-arrow-bottom::before {
+    background: currentColor; /* Makes arrow shaft inherit button text color. */
+    height: 4px; /* Draws a pixel-thick shaft. */
+    top: 1px; /* Vertically centers shaft in the 6px icon row. */
+    width: 20px; /* Sets shaft length. */
+}
+
+.swap-arrow-top::before {
+    left: 0; /* Starts the top arrow shaft on the left. */
+}
+
+.swap-arrow-bottom::before {
+    right: 0; /* Starts the bottom arrow shaft on the right. */
+}
+
+.swap-arrow-top::after {
+    border-block: 5px solid transparent; /* Creates the top arrowhead triangle height. */
+    border-left: 7px solid currentColor; /* Draws the top arrowhead pointing right. */
+    right: 0; /* Places the top arrowhead at the shaft end. */
+    top: -2px; /* Aligns the arrowhead with the shaft. */
+}
+
+.swap-arrow-bottom::after {
+    border-block: 5px solid transparent; /* Creates the bottom arrowhead triangle height. */
+    border-right: 7px solid currentColor; /* Draws the bottom arrowhead pointing left. */
+    left: 0; /* Places the bottom arrowhead at the shaft end. */
+    top: -2px; /* Aligns the arrowhead with the shaft. */
+}
+
+/* Route builder needs custom grid rows so the action buttons stay at the bottom of the NES panel. */
+.route-builder {
+    background: var(--surface-color); /* Keeps selected-route panel white inside NES border. */
+    box-sizing: border-box; /* Includes padding inside the full-height sidebar. */
+    display: grid; /* Creates route-list and action-button rows. */
+    gap: var(--planning-gap, 1rem); /* Matches Planning panel spacing. */
+    grid-template-rows: minmax(0, 1fr) auto; /* Lets selected route scroll while actions stay fixed. */
+    flex: 1 1 auto; /* Fills the remaining space in the sticky right rail. */
+    min-height: 0; /* Allows route steps to scroll internally. */
+    overflow: visible; /* Keeps NES button shadows from being clipped at the panel bottom. */
+    padding: var(
+        --planning-inner-padding,
+        0.85rem
+    ); /* Matches Planning NES panel padding. */
+}
+
+.empty-route {
+    color: var(--muted-text-color); /* Shows empty state as secondary text without Bootstrap dependency. */
+}
+
+.empty-route p {
+    margin: 0; /* Avoids paragraph margin disturbing panel spacing. */
+}
+
+.route-steps {
+    align-content: start; /* Prevents selected route cards from stretching vertically. */
+    display: grid; /* Stacks selected route cards with consistent gaps. */
+    gap: var(--planning-gap, 1rem); /* Matches Planning panel spacing. */
+    list-style: none; /* Removes default ordered-list markers; index is rendered manually. */
+    margin: 0; /* Removes browser default list margin. */
+    min-height: 0; /* Allows internal scrolling in the route panel. */
+    overflow-y: auto; /* Lets long selected routes scroll inside the panel. */
+    padding: 0 0.35rem 0 0; /* Leaves room beside the scrollbar. */
+    scrollbar-color: var(--border-color) var(--surface-alt-color); /* Styles Firefox scrollbar consistently with segment list. */
+    scrollbar-width: auto; /* Keeps Firefox scrollbar usable. */
+}
+
+.route-step-item {
+    background: var(--surface-alt-color); /* Gives route steps a warm panel fill. */
+    font-size: 0.72rem; /* Keeps long station names fitting in the sidebar. */
+    gap: 0.75rem; /* Spaces index, route text, and remove button. */
+    grid-template-columns: auto minmax(0, 1fr) auto; /* Keeps remove button fixed while text wraps. */
+    line-height: 1.45; /* Improves readability for wrapped route text. */
+    padding: 0.65rem; /* Keeps content away from NES card borders. */
+}
+
+.route-step-index {
+    color: var(--muted-text-color); /* Makes step number secondary to the station names. */
+}
+
+.route-step-content {
+    min-width: 0; /* Allows route text to wrap inside the grid column. */
+}
+
+.route-remove-button {
+    min-height: 38px; /* Keeps remove action large enough to click. */
+    min-width: 64px; /* Keeps NES close icon button stable across rows. */
+    padding-inline: 0.45rem; /* Centers NES close icon inside the button. */
+}
+
+.route-actions {
+    grid-template-columns: 1fr 1fr; /* Keeps Clear and Submit equal width. */
+}
+
+@media (max-width: 840px) {
+    .planning-board {
+        grid-template-columns: 1fr; /* Stacks Planning columns when the fixed rail would overflow. */
+    }
+
+    .planning-timer {
+        min-width: 0; /* Allows timer to shrink on narrow screens. */
+    }
+
+    .planning-route-panel {
+        position: static; /* Disables sticky behavior when columns stack. */
+        min-height: auto; /* Lets the right rail collapse naturally on small screens. */
+        width: 100%; /* Lets the right rail fill the stacked mobile column. */
+    }
+
+    .planning-map-panel {
+        width: 100%; /* Keeps the map aligned with Available segments when stacked. */
+    }
+}

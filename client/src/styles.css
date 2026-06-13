@@ -1,0 +1,7 @@
+/* Central stylesheet index: each import points to the page or shared area it styles. */
+@import "./styles/base.css";
+@import "./styles/home.css";
+@import "./styles/auth.css";
+@import "./styles/setup.css";
+@import "./styles/planning.css";
+@import "./styles/execution-result-ranking.css";
