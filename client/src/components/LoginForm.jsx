@@ -3,7 +3,7 @@ import { useUser } from "../contexts/UserContext.js";
 
 function LoginForm({ idPrefix = "login", onSuccess }) {
   const { login } = useUser();
-  const [username, setUsername] = useState("alice@example.com");
+  const [username, setUsername] = useState("ulisse@lastrace.test");
   const [password, setPassword] = useState("race-pass-1");
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);

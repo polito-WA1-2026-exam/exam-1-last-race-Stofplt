@@ -5,7 +5,6 @@ dist/
 *.log
 npm-debug.log*
 
-server/db.sqlite
 server/db.sqlite-journal
 
 .env

@@ -6,9 +6,13 @@ function LoginPage() {
   const { loggedIn } = useUser();
   const location = useLocation();
   const navigate = useNavigate();
+  const from = location.state?.from;
+  const destination = from
+    ? `${from.pathname}${from.search ?? ""}${from.hash ?? ""}`
+    : "/";
 
   if (loggedIn) {
-    return <Navigate to="/setup" replace />;
+    return <Navigate to={destination} replace />;
   }
 
   return (
@@ -17,7 +21,7 @@ function LoginPage() {
       <LoginForm
         idPrefix="login-page"
         onSuccess={() =>
-          navigate(location.state?.from?.pathname ?? "/setup", {
+          navigate(destination, {
             replace: true,
           })
         }

@@ -74,9 +74,9 @@ CREATE TABLE game_steps (
 );
 
 INSERT INTO users (id, email, name, hash, salt) VALUES
-  (1, 'alice@example.com', 'Alice', 'd3f74546f092216982494478e182890922676435cb58679c484b693908d57467', '915a99a6d7d24913fc178a4b3ef93ec4'),
-  (2, 'bruno@example.com', 'Bruno', '32c1ac48df27ab24f81104a974fbc5f5b27308e1ed07f9e944864558ad86b672', '8c11646122c59c91fc78bc5087229e4a'),
-  (3, 'carla@example.com', 'Carla', 'e0a773a0ba7946c8aba597e6c5a91470e47db90fa37ca90425e0f330d2f7dede', 'eb1d0c637059b552ff957622928a6071');
+  (1, 'ulisse@lastrace.test', 'Ulisse', 'd3f74546f092216982494478e182890922676435cb58679c484b693908d57467', '915a99a6d7d24913fc178a4b3ef93ec4'),
+  (2, 'belacqua@lastrace.test', 'Belacqua', '32c1ac48df27ab24f81104a974fbc5f5b27308e1ed07f9e944864558ad86b672', '8c11646122c59c91fc78bc5087229e4a'),
+  (3, 'rifeo@lastrace.test', 'Rifeo', 'e0a773a0ba7946c8aba597e6c5a91470e47db90fa37ca90425e0f330d2f7dede', 'eb1d0c637059b552ff957622928a6071');
 
 INSERT INTO lines (id, name, color) VALUES
   (1, 'Red Line', '#E32017'),

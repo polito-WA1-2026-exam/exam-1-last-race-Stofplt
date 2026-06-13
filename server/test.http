@@ -10,26 +10,26 @@ GET {{baseUrl}}/instructions
 GET {{baseUrl}}/missing
 
 
-### Auth - login Alice
-# @name loginAlice
+### Auth - login Ulisse
+# @name loginUlisse
 POST {{baseUrl}}/sessions
 Content-Type: application/json
 
 {
-  "username": "alice@example.com",
+  "username": "ulisse@lastrace.test",
   "password": "race-pass-1"
 }
 
 ### Auth - current user
 GET {{baseUrl}}/sessions/current
-Cookie: {{loginAlice.response.headers.Set-Cookie}}
+Cookie: {{loginUlisse.response.headers.Set-Cookie}}
 
 ### Auth - bad login, expected 401
 POST {{baseUrl}}/sessions
 Content-Type: application/json
 
 {
-  "username": "alice@example.com",
+  "username": "ulisse@lastrace.test",
   "password": "wrong-password"
 }
 
@@ -38,22 +38,22 @@ Content-Type: application/json
 # Loads the setup map and enables game creation in the current session.
 # @name fullNetwork
 GET {{baseUrl}}/network/full
-Cookie: {{loginAlice.response.headers.Set-Cookie}}
+Cookie: {{loginUlisse.response.headers.Set-Cookie}}
 
 ### Network - planning reduced payload
 # Expected: stations + 23 bidirectional segment pairs, no line names and no SVG paths.
 GET {{baseUrl}}/network/planning
-Cookie: {{loginAlice.response.headers.Set-Cookie}}
+Cookie: {{loginUlisse.response.headers.Set-Cookie}}
 
 ### Network - station-only payload
 # Expected: only station id/name/x/y data for the planning map.
 GET {{baseUrl}}/network/stations
-Cookie: {{loginAlice.response.headers.Set-Cookie}}
+Cookie: {{loginUlisse.response.headers.Set-Cookie}}
 
 ### Network - execution payload
 # Expected: stations, lines and pathless segments. Route paths arrive only from execution state/next.
 GET {{baseUrl}}/network/execution
-Cookie: {{loginAlice.response.headers.Set-Cookie}}
+Cookie: {{loginUlisse.response.headers.Set-Cookie}}
 
 ### Setup - ranking without login, expected 401
 GET {{baseUrl}}/ranking
@@ -62,15 +62,15 @@ GET {{baseUrl}}/ranking
 ### Game - start after network
 # @name startGame
 POST {{baseUrl}}/games
-Cookie: {{loginAlice.response.headers.Set-Cookie}}
+Cookie: {{loginUlisse.response.headers.Set-Cookie}}
 
 ### Game - planning data
 GET {{baseUrl}}/games/{{startGame.response.body.gameId}}/planning
-Cookie: {{loginAlice.response.headers.Set-Cookie}}
+Cookie: {{loginUlisse.response.headers.Set-Cookie}}
 
 ### Game - submit empty route, expected valid=false score=0
 POST {{baseUrl}}/games/{{startGame.response.body.gameId}}/route
-Cookie: {{loginAlice.response.headers.Set-Cookie}}
+Cookie: {{loginUlisse.response.headers.Set-Cookie}}
 Content-Type: application/json
 
 {
@@ -79,24 +79,24 @@ Content-Type: application/json
 
 ### Game - result after failed route
 GET {{baseUrl}}/games/{{startGame.response.body.gameId}}/result
-Cookie: {{loginAlice.response.headers.Set-Cookie}}
+Cookie: {{loginUlisse.response.headers.Set-Cookie}}
 
 
 ### Game - start a second game for manual valid route testing
 # @name startValidGame
 POST {{baseUrl}}/games
-Cookie: {{loginAlice.response.headers.Set-Cookie}}
+Cookie: {{loginUlisse.response.headers.Set-Cookie}}
 
 ### Game - planning data for valid game
 GET {{baseUrl}}/games/{{startValidGame.response.body.gameId}}/planning
-Cookie: {{loginAlice.response.headers.Set-Cookie}}
+Cookie: {{loginUlisse.response.headers.Set-Cookie}}
 
 ### Game - submit sample fixed route
 # Only valid if DEBUG_FIXED_ROUTE is temporarily set to true in server/gameLogic.js:
 # Shady Grove -> Bethesda -> Metro Center -> Foggy Bottom -> L'Enfant Plaza -> Navy Yard -> Waterfront.
 # @name submitValidRoute
 POST {{baseUrl}}/games/{{startValidGame.response.body.gameId}}/route
-Cookie: {{loginAlice.response.headers.Set-Cookie}}
+Cookie: {{loginUlisse.response.headers.Set-Cookie}}
 Content-Type: application/json
 
 {
@@ -106,7 +106,7 @@ Content-Type: application/json
 ### Game - duplicate route submit after accepted route, expected 409
 # Covers the server-side status guard used against double submit/racing route requests.
 POST {{baseUrl}}/games/{{startValidGame.response.body.gameId}}/route
-Cookie: {{loginAlice.response.headers.Set-Cookie}}
+Cookie: {{loginUlisse.response.headers.Set-Cookie}}
 Content-Type: application/json
 
 {
@@ -116,13 +116,13 @@ Content-Type: application/json
 ### Game - execution state before first step
 # Expected: coins=20, lastEvent=null, steps=[].
 GET {{baseUrl}}/games/{{startValidGame.response.body.gameId}}/execution
-Cookie: {{loginAlice.response.headers.Set-Cookie}}
+Cookie: {{loginUlisse.response.headers.Set-Cookie}}
 
 ### Game - execute next step
 # Expected: one event, updated coins and exactly one segment path.
 # @name executeStep1
 POST {{baseUrl}}/games/{{startValidGame.response.body.gameId}}/execute/next
-Cookie: {{loginAlice.response.headers.Set-Cookie}}
+Cookie: {{loginUlisse.response.headers.Set-Cookie}}
 Content-Type: application/json
 
 {
@@ -132,7 +132,7 @@ Content-Type: application/json
 ### Game - duplicate first next request, expected 409 after executeStep1
 # Covers racing/double-clicked Next calls with the same expected step index.
 POST {{baseUrl}}/games/{{startValidGame.response.body.gameId}}/execute/next
-Cookie: {{loginAlice.response.headers.Set-Cookie}}
+Cookie: {{loginUlisse.response.headers.Set-Cookie}}
 Content-Type: application/json
 
 {
@@ -142,11 +142,11 @@ Content-Type: application/json
 ### Game - execution state after one step
 # Expected: one executed step; refreshing the execution page can rebuild this state.
 GET {{baseUrl}}/games/{{startValidGame.response.body.gameId}}/execution
-Cookie: {{loginAlice.response.headers.Set-Cookie}}
+Cookie: {{loginUlisse.response.headers.Set-Cookie}}
 
 ### Game - execute remaining fixed-route steps
 POST {{baseUrl}}/games/{{startValidGame.response.body.gameId}}/execute/next
-Cookie: {{loginAlice.response.headers.Set-Cookie}}
+Cookie: {{loginUlisse.response.headers.Set-Cookie}}
 Content-Type: application/json
 
 {
@@ -155,7 +155,7 @@ Content-Type: application/json
 
 ### Game - execute remaining fixed-route steps
 POST {{baseUrl}}/games/{{startValidGame.response.body.gameId}}/execute/next
-Cookie: {{loginAlice.response.headers.Set-Cookie}}
+Cookie: {{loginUlisse.response.headers.Set-Cookie}}
 Content-Type: application/json
 
 {
@@ -164,7 +164,7 @@ Content-Type: application/json
 
 ### Game - execute remaining fixed-route steps
 POST {{baseUrl}}/games/{{startValidGame.response.body.gameId}}/execute/next
-Cookie: {{loginAlice.response.headers.Set-Cookie}}
+Cookie: {{loginUlisse.response.headers.Set-Cookie}}
 Content-Type: application/json
 
 {
@@ -173,7 +173,7 @@ Content-Type: application/json
 
 ### Game - execute remaining fixed-route steps
 POST {{baseUrl}}/games/{{startValidGame.response.body.gameId}}/execute/next
-Cookie: {{loginAlice.response.headers.Set-Cookie}}
+Cookie: {{loginUlisse.response.headers.Set-Cookie}}
 Content-Type: application/json
 
 {
@@ -182,7 +182,7 @@ Content-Type: application/json
 
 ### Game - execute final fixed-route step, expected completed=true
 POST {{baseUrl}}/games/{{startValidGame.response.body.gameId}}/execute/next
-Cookie: {{loginAlice.response.headers.Set-Cookie}}
+Cookie: {{loginUlisse.response.headers.Set-Cookie}}
 Content-Type: application/json
 
 {
@@ -192,7 +192,7 @@ Content-Type: application/json
 ### Game - execute after completion, expected 409
 # Covers duplicate/racing next-step calls after the route has no pending steps.
 POST {{baseUrl}}/games/{{startValidGame.response.body.gameId}}/execute/next
-Cookie: {{loginAlice.response.headers.Set-Cookie}}
+Cookie: {{loginUlisse.response.headers.Set-Cookie}}
 Content-Type: application/json
 
 {
@@ -201,32 +201,32 @@ Content-Type: application/json
 
 ### Game - result
 GET {{baseUrl}}/games/{{startValidGame.response.body.gameId}}/result
-Cookie: {{loginAlice.response.headers.Set-Cookie}}
+Cookie: {{loginUlisse.response.headers.Set-Cookie}}
 
 ### Ranking - global best scores
 GET {{baseUrl}}/ranking
-Cookie: {{loginAlice.response.headers.Set-Cookie}}
+Cookie: {{loginUlisse.response.headers.Set-Cookie}}
 
 
-### Error case - login Bruno without loading network
-# @name loginBrunoNoNetwork
+### Error case - login Belacqua without loading network
+# @name loginBelacquaNoNetwork
 POST {{baseUrl}}/sessions
 Content-Type: application/json
 
 {
-  "username": "bruno@example.com",
+  "username": "belacqua@lastrace.test",
   "password": "race-pass-2"
 }
 
 ### Error case - start game without network, expected 409
 POST {{baseUrl}}/games
-Cookie: {{loginBrunoNoNetwork.response.headers.Set-Cookie}}
+Cookie: {{loginBelacquaNoNetwork.response.headers.Set-Cookie}}
 
 ### Error case - invalid game id, expected 422 after login
 GET {{baseUrl}}/games/not-a-number/result
-Cookie: {{loginAlice.response.headers.Set-Cookie}}
+Cookie: {{loginUlisse.response.headers.Set-Cookie}}
 
 
-### Auth - logout Alice
+### Auth - logout Ulisse
 DELETE {{baseUrl}}/sessions/current
-Cookie: {{loginAlice.response.headers.Set-Cookie}}
+Cookie: {{loginUlisse.response.headers.Set-Cookie}}
