@@ -17,6 +17,7 @@ const SHADOW_OFFSET = 1.2;
 const DRAW_DURATION = 3000;
 const HOLD_AT_START = 200;
 
+// Removes duplicate opposite paths so setup draws each physical line once.
 function dedupePhysicalSegments(segments) {
   const seen = new Set();
 
@@ -32,26 +33,38 @@ function dedupePhysicalSegments(segments) {
   });
 }
 
+// Animated full-network map used during setup.
 function NetworkMap({ lines = [], segments = [], stations = [] }) {
+  // The SVG is rebuilt imperatively because path length sampling is DOM-based.
   const svgRef = useRef(null);
+  // Drawing uses one physical path per line segment to avoid double-thick pixels.
   const physicalSegments = useMemo(
     () => dedupePhysicalSegments(segments),
     [segments]
   );
+  // Interchange styling depends on how many lines touch each station.
   const stationLineIds = useMemo(
     () => getStationLineIds(stations, segments),
     [stations, segments]
   );
+  // Fast line lookup provides colors for marker outlines.
   const lineById = useMemo(
     () => new Map(lines.map((line) => [line.id, line])),
     [lines]
   );
+  // Label offsets are derived once per station list to keep text readable.
   const labelOffsetByStation = useMemo(
     () => getLabelOffsetByStation(stations),
     [stations]
   );
+  // ViewBox is generated from seeded coordinates instead of hardcoding bounds.
   const viewBox = useMemo(() => buildViewBox(stations), [stations]);
 
+  /*
+   * The animation is built from sampled SVG path points. React owns the
+   * component lifecycle, while DOM APIs provide getTotalLength and
+   * getPointAtLength for the pixel-by-pixel reveal.
+   */
   useEffect(() => {
     const svg = svgRef.current;
 
@@ -67,6 +80,7 @@ function NetworkMap({ lines = [], segments = [], stations = [] }) {
     };
     const frame = { id: null };
 
+    // Records when a station should become visible along one animated line.
     function addReveal(stationId, lineId, distance) {
       if (!state.revealByStation.has(stationId)) {
         state.revealByStation.set(stationId, []);
@@ -75,6 +89,7 @@ function NetworkMap({ lines = [], segments = [], stations = [] }) {
       state.revealByStation.get(stationId).push({ lineId, distance });
     }
 
+    // Creates one colored or shadow pixel at a sampled path point.
     function buildPixel(point, lineId, distance, color, isShadow, pixelLayer) {
       const offset = isShadow ? SHADOW_OFFSET : 0;
       const pixel = svgEl("rect", {
@@ -90,6 +105,7 @@ function NetworkMap({ lines = [], segments = [], stations = [] }) {
       state.pixels.push({ distance, element: pixel, lineId });
     }
 
+    // Samples a source path into evenly spaced pixel rectangles.
     function buildPixels(path, lineId, color, offset, length, pixelLayer) {
       for (let distance = 0; distance <= length; distance += PIXEL_STEP) {
         const point = path.getPointAtLength(distance);
@@ -107,6 +123,7 @@ function NetworkMap({ lines = [], segments = [], stations = [] }) {
       }
     }
 
+    // Builds marker and label in one group so hover scaling remains stable in Safari.
     function buildMarker(station, annotationLayer) {
       const lineIds = stationLineIds.get(station.id) ?? new Set();
       const isInterchange = lineIds.size > 1;
@@ -140,6 +157,7 @@ function NetworkMap({ lines = [], segments = [], stations = [] }) {
         class: "label-anchor",
         transform: labelBaseTransform
       });
+      // Scaling the translated group avoids Safari moving SVG text on hover.
       const showLabelHover = () =>
         labelAnchor.setAttribute("transform", labelHoverTransform);
       const hideLabelHover = () =>
@@ -149,6 +167,7 @@ function NetworkMap({ lines = [], segments = [], stations = [] }) {
       marker.addEventListener("mouseleave", hideLabelHover);
       marker.addEventListener("focus", showLabelHover);
       marker.addEventListener("blur", hideLabelHover);
+
       const text = svgEl("text", {
         class: "label",
         x: 0,
@@ -164,6 +183,7 @@ function NetworkMap({ lines = [], segments = [], stations = [] }) {
       state.annotations.push({ element: marker, stationId: station.id });
     }
 
+    // Adds hidden source geometry and visible pixel layers for one metro line.
     function buildLine(line, sourceLayer, pixelLayer) {
       const lineSegments = physicalSegments.filter(
         (segment) => segment.lineId === line.id
@@ -191,6 +211,7 @@ function NetworkMap({ lines = [], segments = [], stations = [] }) {
       state.lineLengths.set(line.id, offset);
     }
 
+    // Reveals stations once any serving line has reached their sampled distance.
     function updateAnnotations(lineProgress) {
       state.annotations.forEach(({ element, stationId }) => {
         const reveals = state.revealByStation.get(stationId) ?? [];
@@ -202,12 +223,14 @@ function NetworkMap({ lines = [], segments = [], stations = [] }) {
       });
     }
 
+    // Toggles visibility for pixels already reached by the current line progress.
     function updatePixels(lineProgress) {
       state.pixels.forEach(({ distance, element, lineId }) => {
         element.classList.toggle("is-visible", lineProgress.get(lineId) >= distance);
       });
     }
 
+    // Advances all lines together from hidden pixels to the full network.
     function animate(startTime) {
       frame.startTime ??= startTime;
 

@@ -6,6 +6,7 @@ const LABEL_LOWER_Y = 11;
 const STATION_SIZE = 8;
 const INTERCHANGE_SIZE = 12;
 
+// Creates SVG nodes with attributes in one place for dynamic map builders.
 function svgEl(tag, attributes = {}) {
   const element = document.createElementNS(SVG_NS, tag);
 
@@ -16,6 +17,7 @@ function svgEl(tag, attributes = {}) {
   return element;
 }
 
+// Builds a padded viewBox from station coordinates so maps fit any seeded network.
 function buildViewBox(stations) {
   if (stations.length === 0) {
     return "0 0 800 600";
@@ -31,6 +33,7 @@ function buildViewBox(stations) {
   return `${minX} ${minY} ${maxX - minX} ${maxY - minY}`;
 }
 
+// Maps each station to the set of lines touching it, which identifies interchanges.
 function getStationLineIds(stations, segments) {
   const lineIdsByStation = new Map(
     stations.map((station) => [station.id, new Set()]),
@@ -44,6 +47,7 @@ function getStationLineIds(stations, segments) {
   return lineIdsByStation;
 }
 
+// Alternates label vertical offsets for stations sharing the same row.
 function getLabelOffsetByStation(stations) {
   const stationsByY = new Map();
 

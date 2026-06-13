@@ -6,6 +6,7 @@ import ReactDOM from "react-dom/client";
 import App from "./App.jsx";
 import "./styles.css";
 
+// StrictMode surfaces unsafe React patterns during development evaluation.
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <App />

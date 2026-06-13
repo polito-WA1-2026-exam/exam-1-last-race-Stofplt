@@ -122,7 +122,9 @@ The relational model is also documented in `docs/DB_RELATIONAL_MODEL.md`.
 
 ## Screenshot
 
-Screenshot to be added before final submission.
+![Planning page](planning_screenshot.png)
+
+![Ranking page](ranking_screenshot.png)
 
 ## Users Credentials
 

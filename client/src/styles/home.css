@@ -85,48 +85,35 @@
     position: absolute;
 }
 
+/* Pixel map icon: three colored lines share one grid without image assets. */
 .home-rule-icon.is-map {
-    /* Disegniamo le linee ferroviarie asimmetriche con i 3 colori */
     background:
-        /* --- LINEA BLU --- */
-        /* Tratto verticale (parte in alto a sx) */
-        linear-gradient(#003688, #003688) 20px 20px / 10px 50px no-repeat, 
-        /* Tratto orizzontale (piega a dx) */
-        linear-gradient(#003688, #003688) 20px 60px / 60px 10px no-repeat, 
+        linear-gradient(#003688, #003688) 20px 20px / 10px 50px no-repeat,
+        linear-gradient(#003688, #003688) 20px 60px / 60px 10px no-repeat,
 
-        /* --- LINEA ROSSA --- */
-        /* Tratto orizzontale (parte in alto al centro) */
-        linear-gradient(#e32017, #e32017) 40px 20px / 50px 10px no-repeat, 
-        /* Tratto verticale (scende a dx) */
-        linear-gradient(#e32017, #e32017) 80px 20px / 10px 50px no-repeat, 
+        linear-gradient(#e32017, #e32017) 40px 20px / 50px 10px no-repeat,
+        linear-gradient(#e32017, #e32017) 80px 20px / 10px 50px no-repeat,
 
-        /* --- LINEA VERDE --- */
-        /* Tratto orizzontale (parte in basso a sx) */
-        linear-gradient(#8bd13c, #8bd13c) 10px 80px / 50px 10px no-repeat, 
-        /* Tratto verticale (sale al centro) */
-        linear-gradient(#8bd13c, #8bd13c) 50px 40px / 10px 50px no-repeat, 
-        /* Tratto orizzontale (esce a dx) */
+        linear-gradient(#8bd13c, #8bd13c) 10px 80px / 50px 10px no-repeat,
+        linear-gradient(#8bd13c, #8bd13c) 50px 40px / 10px 50px no-repeat,
         linear-gradient(#8bd13c, #8bd13c) 50px 40px / 50px 10px no-repeat;
-        
+
     position: relative;
 }
 
+/* Final map icon geometry extends the blue line to create a readable interchange. */
 .home-rule-icon.is-map {
     background:
-        /* --- LINEA BLU --- */
-        linear-gradient(#003688, #003688) 20px 20px / 10px 50px no-repeat, 
-        /* Allungata da 60px a 70px per farla incrociare con la Rossa */
-        linear-gradient(#003688, #003688) 20px 60px / 70px 10px no-repeat, 
+        linear-gradient(#003688, #003688) 20px 20px / 10px 50px no-repeat,
+        linear-gradient(#003688, #003688) 20px 60px / 70px 10px no-repeat,
 
-        /* --- LINEA ROSSA --- */
-        linear-gradient(#e32017, #e32017) 40px 20px / 50px 10px no-repeat, 
-        linear-gradient(#e32017, #e32017) 80px 20px / 10px 50px no-repeat, 
+        linear-gradient(#e32017, #e32017) 40px 20px / 50px 10px no-repeat,
+        linear-gradient(#e32017, #e32017) 80px 20px / 10px 50px no-repeat,
 
-        /* --- LINEA VERDE --- */
-        linear-gradient(#8bd13c, #8bd13c) 10px 80px / 50px 10px no-repeat, 
-        linear-gradient(#8bd13c, #8bd13c) 50px 40px / 10px 50px no-repeat, 
+        linear-gradient(#8bd13c, #8bd13c) 10px 80px / 50px 10px no-repeat,
+        linear-gradient(#8bd13c, #8bd13c) 50px 40px / 10px 50px no-repeat,
         linear-gradient(#8bd13c, #8bd13c) 50px 40px / 50px 10px no-repeat;
-        
+
     position: relative;
 }
 
@@ -135,30 +122,28 @@
     position: absolute;
     width: 10px;
     height: 10px;
-    
-    background: var(--icon-color); /* Capolinea Blu */
+
+    background: var(--icon-color);
     left: 20px;
-    top: 20px; 
-    
+    top: 20px;
+
+    /* Node positions mark endpoints, bends and one dark interchange. */
     box-shadow:
-        /* Nodi classici grigi */
-        0px 40px var(--icon-color),   /* Curva Blu */
-        30px 40px var(--icon-color),  /* Incrocio Blu / Verde */
-        60px 0px var(--icon-color),   /* Curva Rossa */
-        60px 20px var(--icon-color),  /* Incrocio Rosso / Verde */
-        30px 60px var(--icon-color),  /* Curva Verde in basso */
-        30px 20px var(--icon-color),  /* Curva Verde al centro */
-        
-        /* IL PUNTINO NERO: posizionato sull'incrocio tra la Rossa (x=80) e la Blu (y=60) */
-        60px 40px #171720; 
+        0px 40px var(--icon-color),
+        30px 40px var(--icon-color),
+        60px 0px var(--icon-color),
+        60px 20px var(--icon-color),
+        30px 60px var(--icon-color),
+        30px 20px var(--icon-color),
+        60px 40px #171720;
 }
 
 .home-rule-icon.is-map::after {
-    display: none; 
+    display: none;
 }
 
+/* Route icon draws a compact S-shaped path with start and destination nodes. */
 .home-rule-icon.is-route {
-    /* Il percorso resta identico, una "S" spessa 10px */
     background:
         linear-gradient(var(--icon-color), var(--icon-color)) 20px 20px / 60px 10px no-repeat,
         linear-gradient(var(--icon-color), var(--icon-color)) 70px 30px / 10px 20px no-repeat,
@@ -171,68 +156,61 @@
 .home-rule-icon.is-route::before {
     content: "";
     position: absolute;
-    /* I checkpoint diventano grossi quadrati 2x2 (20x20 pixel) */
     width: 20px;
     height: 20px;
-    
-    /* Il percorso inizia a 20x 20y. 
-       Mettendo il quadrato a 15x 15y (-5px) lo centriamo perfettamente al centro della strada! */
+
+    /* Offsets center the large node on the first route segment. */
     left: 15px;
     top: 15px;
-    background: #8bd13c; /* Nodo Verde (Partenza) */
-    
-    /* Le ombre creano gli altri nodi 20x20 calcolando la distanza dal nodo verde */
-    box-shadow:
-        50px 0 #ffd300,    /* Nodo Giallo: centrato sull'angolo in alto a destra */
-        10px 30px #e32017, /* Nodo Rosso: centrato sull'angolo a metà a sinistra */
-        50px 60px #003688; /* Nodo Blu (Arrivo): centrato in basso a destra */
-}
+    background: #8bd13c;
 
+    /* Shadow nodes keep all checkpoints in one pseudo-element. */
+    box-shadow:
+        50px 0 #ffd300,
+        10px 30px #e32017,
+        50px 60px #003688;
+}
 
 .home-rule-icon.is-route::after {
     display: none;
 }
+
+/* Timer icon uses stacked gradients to form an hourglass outline. */
 .home-rule-icon.is-timer {
-    /* Struttura alzata di 1 "pixel art" (10px in meno su tutte le altezze Y) */
     background:
-        /* Tappo superiore */
         linear-gradient(var(--icon-color), var(--icon-color)) 20px 0px / 70px 10px no-repeat,
-        /* Vetro alto (sinistra e destra) */
         linear-gradient(var(--icon-color), var(--icon-color)) 30px 10px / 10px 20px no-repeat,
         linear-gradient(var(--icon-color), var(--icon-color)) 70px 10px / 10px 20px no-repeat,
-        /* Restringimento centrale (sinistra e destra) */
         linear-gradient(var(--icon-color), var(--icon-color)) 40px 30px / 10px 30px no-repeat,
         linear-gradient(var(--icon-color), var(--icon-color)) 60px 30px / 10px 30px no-repeat,
-        /* Vetro basso (sinistra e destra) */
         linear-gradient(var(--icon-color), var(--icon-color)) 30px 60px / 10px 20px no-repeat,
         linear-gradient(var(--icon-color), var(--icon-color)) 70px 60px / 10px 20px no-repeat,
-        /* Tappo inferiore */
         linear-gradient(var(--icon-color), var(--icon-color)) 20px 80px / 70px 10px no-repeat;
 }
 
+/* Sand pixels are grouped as shadows from one base square. */
 .home-rule-icon.is-timer::before {
     background: #ffd300;
     height: 10px;
     width: 10px;
     left: 40px;
-    /* Anche la sabbia parte 10px più in alto */
-    top: 20px; 
-    
-    /* Le ombre restano identiche perché calcolate rispetto al punto di partenza */
+    top: 20px;
+
     box-shadow:
-        10px 0 #ffd300, 20px 0 #ffd300,        
-        10px 10px #ffd300,                     
-        10px 20px #ffd300,                     
-        10px 30px #ffd300,                     
-        10px 40px #ffd300,                     
-        0 50px #ffd300, 10px 50px #ffd300, 20px 50px #ffd300; 
+        10px 0 #ffd300, 20px 0 #ffd300,
+        10px 10px #ffd300,
+        10px 20px #ffd300,
+        10px 30px #ffd300,
+        10px 40px #ffd300,
+        0 50px #ffd300, 10px 50px #ffd300, 20px 50px #ffd300;
 }
+
 .home-rule-icon.is-timer::after {
     display: none;
 }
 
+/* Finish icon keeps the pole and flag as two pixel-art layers. */
 .home-rule-icon.is-finish {
-    /* Disegna SOLO il palo verticale scuro, rimuovendo le vecchie linee orizzontali */
     background: linear-gradient(var(--icon-color), var(--icon-color)) 18px 12px / 10px 82px no-repeat;
     position: relative;
 }
@@ -242,32 +220,29 @@
     position: absolute;
     width: 10px;
     height: 10px;
-    left: 28px; /* Attaccato alla destra del palo */
+    left: 28px;
     top: 22px;
-    
-    /* Il blocco iniziale (in alto a sinistra, riga 1, colonna 1) è nero */
-    background: #171720; 
-    
-    /* Disegniamo tutti gli altri pixel della bandiera sfalsandoli per creare il vento */
-    box-shadow:
-        /* --- PIXEL NERI --- */
-        0 20px #171720,
-        10px 10px #171720, 10px 30px #171720,  /* Colonna 2 (abbassata) */
-        20px 0 #171720, 20px 20px #171720,    /* Colonna 3 (alzata) */
-        30px 10px #171720, 30px 30px #171720, /* Colonna 4 (abbassata) */
-        40px 0 #171720, 40px 20px #171720,    /* Colonna 5 (alzata) */
-        50px 30px #171720,                    /* Coda finale che svolazza */
 
-        /* --- PIXEL BIANCHI --- */
+    background: #171720;
+
+    /* Alternating black and white pixels create the waving flag shape. */
+    box-shadow:
+        0 20px #171720,
+        10px 10px #171720, 10px 30px #171720,
+        20px 0 #171720, 20px 20px #171720,
+        30px 10px #171720, 30px 30px #171720,
+        40px 0 #171720, 40px 20px #171720,
+        50px 30px #171720,
+
         0 10px #ffffff, 0 30px #ffffff,
         10px 20px #ffffff, 10px 40px #ffffff,
         20px 10px #ffffff, 20px 30px #ffffff,
         30px 20px #ffffff, 30px 40px #ffffff,
         40px 10px #ffffff, 40px 30px #ffffff,
-        50px 20px #ffffff;                    /* Coda finale che svolazza */
+        50px 20px #ffffff;
 }
 
-/* Rimuoviamo completamente il quadrato rosso */
+/* The finish icon uses only the pole and flag layers. */
 .home-rule-icon.is-finish::after {
     display: none;
 }

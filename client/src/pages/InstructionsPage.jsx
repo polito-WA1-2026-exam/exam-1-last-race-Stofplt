@@ -26,11 +26,14 @@ const HOW_TO_PLAY_CARDS = [
   },
 ];
 
+// Public landing page; anonymous users can read rules but must log in to play.
 function InstructionsPage() {
   const { loggedIn } = useUser();
   const navigate = useNavigate();
+  // Controls the navbar-style login dialog opened from the Play button.
   const [loginOpen, setLoginOpen] = useState(false);
 
+  // Logged-in players go to setup; anonymous visitors authenticate first.
   function handlePlayNow() {
     if (loggedIn) {
       navigate("/setup");

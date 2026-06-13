@@ -12,6 +12,7 @@ const db = new sqlite3.Database("db.sqlite");
 const scrypt = promisify(crypto.scrypt);
 let writeQueue = Promise.resolve();
 
+// Wraps sqlite3 single-row reads in promises for async route handlers.
 function get(sql, params = []) {
   return new Promise((resolve, reject) => {
     db.get(sql, params, (err, row) => {
@@ -21,6 +22,7 @@ function get(sql, params = []) {
   });
 }
 
+// Wraps sqlite3 multi-row reads in promises.
 function all(sql, params = []) {
   return new Promise((resolve, reject) => {
     db.all(sql, params, (err, rows) => {
@@ -30,6 +32,7 @@ function all(sql, params = []) {
   });
 }
 
+// Wraps sqlite3 writes and exposes metadata such as changes and lastID.
 function run(sql, params = []) {
   return new Promise((resolve, reject) => {
     db.run(sql, params, function (err) {
@@ -39,6 +42,11 @@ function run(sql, params = []) {
   });
 }
 
+/*
+ * Serializes write transactions in process. SQLite already locks the database,
+ * but this queue keeps double-clicked route submits or Next requests ordered
+ * before they enter BEGIN IMMEDIATE transactions.
+ */
 async function withWriteLock(operation) {
   const previousOperation = writeQueue;
   let releaseLock;
@@ -56,6 +64,7 @@ async function withWriteLock(operation) {
   }
 }
 
+// Removes password material before returning a user to the session/client.
 function toPublicUser(row) {
   return {
     id: row.id,
@@ -64,6 +73,7 @@ function toPublicUser(row) {
   };
 }
 
+// Authenticates by recomputing the salted hash and comparing it in constant time.
 async function getUser(username, password) {
   const user = await get(
     "SELECT id, email, name, hash, salt FROM users WHERE email = ?",
@@ -84,6 +94,7 @@ async function getUser(username, password) {
   return toPublicUser(user);
 }
 
+// Reloads the public user stored in the session serializer.
 async function getUserById(id) {
   const user = await get("SELECT id, email, name FROM users WHERE id = ?", [
     id,
@@ -91,6 +102,7 @@ async function getUserById(id) {
   return user ? toPublicUser(user) : false;
 }
 
+// Returns station coordinates used by all map variants.
 async function getStations() {
   const rows = await all(
     `SELECT id, name, x, y
@@ -101,6 +113,7 @@ async function getStations() {
   return rows.map((row) => new Station(row.id, row.name, row.x, row.y));
 }
 
+// Returns fixed metro lines with their display colors.
 async function getLines() {
   const rows = await all(
     `SELECT id, name, color
@@ -111,6 +124,7 @@ async function getLines() {
   return rows.map((row) => new Line(row.id, row.name, row.color));
 }
 
+// Returns directed network segments, including SVG paths for trusted views.
 async function getSegments() {
   const rows = await all(
     `SELECT id, from_station_id, to_station_id, line_id, path
@@ -130,6 +144,7 @@ async function getSegments() {
   );
 }
 
+// Collapses opposite directed segments into one planning pair with two directions.
 async function getPlanningSegmentPairs() {
   const segments = await getSegments();
   const stations = await getStations();
@@ -165,6 +180,7 @@ async function getPlanningSegmentPairs() {
   }));
 }
 
+// Creates a planning game; the assigned stations are chosen before this call.
 async function createGame(userId, startStationId, destinationStationId) {
   return await withWriteLock(async () => {
     const result = await run(
@@ -185,6 +201,7 @@ async function createGame(userId, startStationId, destinationStationId) {
   });
 }
 
+// Fetches one game owned by a user for status-sensitive API guards.
 async function getGameForUser(gameId, userId) {
   return await get(
     `SELECT id,
@@ -201,6 +218,7 @@ async function getGameForUser(gameId, userId) {
   );
 }
 
+// Fetches the planning payload without exposing route or event details.
 async function getPlanningGame(gameId, userId) {
   return await get(
     `SELECT g.id,
@@ -217,6 +235,7 @@ async function getPlanningGame(gameId, userId) {
   );
 }
 
+// Resolves submitted segment ids in the same order selected by the player.
 async function getSegmentsByIds(segmentIds) {
   if (segmentIds.length === 0) {
     return [];
@@ -245,6 +264,7 @@ async function getSegmentsByIds(segmentIds) {
   return segmentIds.map((id) => segmentById.get(id) ?? null);
 }
 
+// Derives interchange stations from stations served by more than one line.
 async function getInterchangeStationIds() {
   const rows = await all(
     `SELECT station_id
@@ -260,6 +280,11 @@ async function getInterchangeStationIds() {
   return new Set(rows.map((row) => row.station_id));
 }
 
+/*
+ * Persists a valid route as ordered game_steps rows with event_id = NULL.
+ * The status update and inserts share one transaction, so a duplicate submit
+ * cannot partially overwrite an already accepted route.
+ */
 async function savePlannedRoute(gameId, segmentIds) {
   return await withWriteLock(async () => {
     await run("BEGIN IMMEDIATE TRANSACTION");
@@ -294,6 +319,7 @@ async function savePlannedRoute(gameId, segmentIds) {
   });
 }
 
+// Stores an invalid or expired planning phase as a zero-score failed game.
 async function failGame(gameId) {
   await withWriteLock(() =>
     run(
@@ -307,6 +333,7 @@ async function failGame(gameId) {
   );
 }
 
+// Picks one event uniformly for a single execution step.
 async function getRandomEvent() {
   return await get(
     `SELECT id, description, effect
@@ -316,6 +343,7 @@ async function getRandomEvent() {
   );
 }
 
+// Computes current coins from the initial 20 plus already assigned events.
 async function getCurrentCoins(gameId) {
   const row = await get(
     `SELECT COALESCE(20 + SUM(e.effect), 20) AS coins
@@ -328,6 +356,11 @@ async function getCurrentCoins(gameId) {
   return row.coins;
 }
 
+/*
+ * Executes exactly one expected pending step. The transaction reads the target
+ * row, assigns one random event, and only completes the game when no NULL
+ * event_id rows remain, protecting against repeated Next clicks.
+ */
 async function executeNextPendingStep(gameId, expectedStepIndex) {
   return await withWriteLock(async () => {
     await run("BEGIN IMMEDIATE TRANSACTION");
@@ -401,6 +434,7 @@ async function executeNextPendingStep(gameId, expectedStepIndex) {
   });
 }
 
+// Fetches the final game header shown on the result page.
 async function getGameResult(gameId, userId) {
   return await get(
     `SELECT g.id,
@@ -420,6 +454,7 @@ async function getGameResult(gameId, userId) {
   );
 }
 
+// Returns executed steps with station names, line names, paths and event data.
 async function getExecutedSteps(gameId) {
   return await all(
     `SELECT gs.step_index,
@@ -445,6 +480,7 @@ async function getExecutedSteps(gameId) {
   );
 }
 
+// Returns each user's best completed score for the leaderboard.
 async function getRanking() {
   return await all(
     `SELECT u.id AS user_id,

@@ -3,11 +3,14 @@ import { Spinner } from "react-bootstrap";
 import { useNavigate, useParams } from "react-router";
 import { getGameResult } from "../api/api.js";
 
+// Final screen for both completed routes and failed planning submissions.
 function ResultPage() {
   const { gameId } = useParams();
   const navigate = useNavigate();
+  // Null keeps the loader visible until the server confirms the game result.
   const [result, setResult] = useState(null);
 
+  // Result data is authoritative because final score is stored server-side.
   useEffect(() => {
     let active = true;
 

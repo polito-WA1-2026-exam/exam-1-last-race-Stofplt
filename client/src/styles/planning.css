@@ -255,6 +255,7 @@
     background-color: var(--available-segment-background-color);
 }
 
+/* Selected segment buttons override NES primary blue with the app palette. */
 .segment-control-group.is-selected .segment-toggle-button.is-primary,
 .segment-control-group.is-selected .segment-toggle-button.is-primary:hover,
 .segment-control-group.is-selected .segment-toggle-button.is-primary:focus {
@@ -262,6 +263,7 @@
     color: var(--selected-segment-text-color);
 }
 
+/* NES button shadows need matching palette colors in every interaction state. */
 .segment-control-group.is-selected .segment-toggle-button.is-primary::after,
 .segment-control-group.is-selected
     .segment-toggle-button.is-primary:hover::after {

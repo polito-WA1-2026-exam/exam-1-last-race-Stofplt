@@ -1,13 +1,18 @@
 import { useState } from "react";
 import { useUser } from "../contexts/UserContext.js";
 
+// Reusable login form used by both the route page and modal dialog.
 function LoginForm({ idPrefix = "login", onSuccess }) {
   const { login } = useUser();
-  const [username, setUsername] = useState("ulisse@lastrace.test");
-  const [password, setPassword] = useState("race-pass-1");
+  // Controlled credentials stay empty until the user types them.
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  // Displays authentication failures returned by the server.
   const [error, setError] = useState("");
+  // Prevents duplicate login attempts while Passport responds.
   const [submitting, setSubmitting] = useState(false);
 
+  // Delegates credential validation to the auth context and then notifies parent UI.
   async function handleSubmit(event) {
     event.preventDefault();
     setError("");

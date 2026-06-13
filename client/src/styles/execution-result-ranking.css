@@ -1,8 +1,9 @@
 /* Small result/execution/ranking styles that remain more concise than repeated JSX classes. */
 .execution-page {
-    --execution-gap: 1rem;
+    --execution-gap: 1rem; /* Shares spacing across execution-only layout pieces. */
 }
 
+/* Execution header and bottom rows share the same map-width container. */
 .execution-header,
 .execution-actions,
 .execution-bottom {
@@ -12,6 +13,7 @@
     width: 100%;
 }
 
+/* The event box stays centered while the Next button is aligned to the right edge. */
 .execution-bottom .execution-event {
     margin: 0 auto;
 }
@@ -23,12 +25,14 @@
     transform: translateY(-50%);
 }
 
+/* Keeps execution map width synchronized with setup and planning summaries. */
 .execution-map-wrapper {
     margin-inline: auto;
     max-width: 1080px;
     width: 100%;
 }
 
+/* Current coins are shown as a compact NES panel independent from Bootstrap cards. */
 .execution-coins {
     background: var(--surface-color);
     box-sizing: border-box;
@@ -37,6 +41,7 @@
     padding: 0.85rem;
 }
 
+/* Last event summary uses a constrained panel so route controls stay visually anchored. */
 .execution-event {
     background: var(--surface-color);
     box-sizing: border-box;
@@ -45,17 +50,20 @@
     width: 50%;
 }
 
+/* Event copy uses a smaller pixel font to fit generated event descriptions. */
 .execution-event-text {
     font-family: "Press Start 2P", system-ui, sans-serif;
     font-size: 0.72rem;
     line-height: 1.6;
 }
 
+/* The coin delta is intentionally larger than the event description. */
 .execution-event-effect {
     font-family: "Press Start 2P", system-ui, sans-serif;
     font-size: 1.1rem;
 }
 
+/* Positive and negative event effects keep their semantic colors. */
 .execution-event-effect.is-positive {
     color: var(--success-color);
 }
@@ -64,6 +72,7 @@
     color: var(--danger-color);
 }
 
+/* Executed step cards summarize each persisted game_step row. */
 .execution-step {
     background: var(--surface-color); /* Matches the app's light panel color. */
     border: 1px solid var(--subtle-border-color); /* Adds a subtle separator without a full NES container. */
@@ -71,6 +80,7 @@
     padding: 0.9rem; /* Gives execution details readable spacing. */
 }
 
+/* Result summary is a definition list styled as aligned key/value rows. */
 .planning-summary {
     background: var(--surface-color); /* Gives result summary a simple white panel. */
     border: 1px solid var(--subtle-border-color); /* Separates the summary from the page background. */
@@ -97,6 +107,7 @@
     margin: 0; /* Removes default definition-list margin. */
 }
 
+/* Ranking and result pages share the same content width as the main map views. */
 .ranking-page {
     margin-inline: auto;
     max-width: 1080px;
@@ -107,6 +118,7 @@
     max-width: 1080px;
 }
 
+/* Result header/actions stay aligned with the result card below. */
 .result-header,
 .result-actions {
     margin-inline: auto;
@@ -114,6 +126,7 @@
     width: 100%;
 }
 
+/* Final score card is intentionally narrower than the map-sized summaries. */
 .result-card {
     background: var(--surface-color);
     box-sizing: border-box;
@@ -122,6 +135,7 @@
     width: 100%;
 }
 
+/* Score label/value sizes create hierarchy without changing the NES font. */
 .result-score-label {
     color: var(--muted-text-color);
     font-family: "Press Start 2P", system-ui, sans-serif;
@@ -133,12 +147,14 @@
     font-size: 1.5rem;
 }
 
+/* Ranking header matches the table wrapper width. */
 .ranking-header {
     margin-inline: auto;
     max-width: 1080px;
     width: 100%;
 }
 
+/* The table wrapper allows horizontal scrolling before the NES table overflows. */
 .ranking-table-wrapper {
     display: flex;
     justify-content: center;
@@ -149,6 +165,7 @@
     height: 100%;
 }
 
+/* Ranking table keeps the palette-controlled background through NES table defaults. */
 .ranking-table-wrapper .nes-table {
     background: var(--ranking-table-background-color);
     border-image-repeat: stretch;

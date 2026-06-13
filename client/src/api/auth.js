@@ -1,5 +1,6 @@
 import { SERVER_URL } from "./api.js";
 
+// Creates a Passport session and returns the public user payload.
 async function login(credentials) {
   const response = await fetch(`${SERVER_URL}/sessions`, {
     method: "POST",
@@ -16,6 +17,7 @@ async function login(credentials) {
   return await response.json();
 }
 
+// Treats 401 as an anonymous visitor rather than an application error.
 async function getCurrentUser() {
   const response = await fetch(`${SERVER_URL}/sessions/current`, {
     credentials: "include"
@@ -31,6 +33,7 @@ async function getCurrentUser() {
   return await response.json();
 }
 
+// Ends the current session; a missing session is already logged out.
 async function logout() {
   const response = await fetch(`${SERVER_URL}/sessions/current`, {
     method: "DELETE",

@@ -17,6 +17,7 @@ const SHADOW_OFFSET = 1.2;
 const DRAW_DURATION = 500;
 const HOLD_AT_START = 0;
 
+// Draws only executed route segments and animates the most recent one.
 function ExecutionMap({
   animatedSegmentId = null,
   executedPaths = [],
@@ -24,25 +25,32 @@ function ExecutionMap({
   stations = [],
   networkSegments = [],
 }) {
+  // Dynamic SVG is rebuilt from execution state because path sampling is DOM-only.
   const svgRef = useRef(null);
 
+  // Line metadata supplies colors for executed segment pixels and station outlines.
   const lineById = useMemo(() => new Map(lines.map((l) => [l.id, l])), [lines]);
+  // Label offsets match the setup map so station names do not overlap.
   const labelOffsetByStation = useMemo(
     () => getLabelOffsetByStation(stations),
     [stations],
   );
+  // Execution map bounds follow the full station set, not only executed paths.
   const viewBox = useMemo(() => buildViewBox(stations), [stations]);
 
+  // Keeps only steps that already expose an SVG path from the server.
   const executedSegments = useMemo(
     () => executedPaths.filter((segment) => segment.path),
     [executedPaths],
   );
 
+  // Interchange styling still uses the full network shape.
   const stationLineIds = useMemo(
     () => getStationLineIds(stations, networkSegments),
     [stations, networkSegments],
   );
 
+  // Rebuilds the SVG whenever execution progress changes.
   useEffect(() => {
     const svg = svgRef.current;
 
@@ -59,6 +67,7 @@ function ExecutionMap({
       (segment) => segment.segmentId === animatedSegmentId,
     );
 
+    // Builds always-visible station annotations with Safari-safe hover labels.
     function buildMarker(station, annotationLayer) {
       const lineIds = stationLineIds.get(station.id) ?? new Set();
       const isInterchange = lineIds.size > 1;
@@ -92,6 +101,7 @@ function ExecutionMap({
         class: "label-anchor",
         transform: labelBaseTransform,
       });
+      // Scaling the translated group avoids Safari shifting text coordinates.
       const showLabelHover = () =>
         labelAnchor.setAttribute("transform", labelHoverTransform);
       const hideLabelHover = () =>
@@ -101,6 +111,7 @@ function ExecutionMap({
       marker.addEventListener("mouseleave", hideLabelHover);
       marker.addEventListener("focus", showLabelHover);
       marker.addEventListener("blur", hideLabelHover);
+
       const text = svgEl("text", {
         class: "label",
         x: 0,
@@ -116,6 +127,7 @@ function ExecutionMap({
       state.annotations.push({ element: marker, stationId: station.id });
     }
 
+    // Samples executed paths into visible pixels, leaving the newest path hidden for animation.
     function buildLine(line, sourceLayer, pixelLayer) {
       const lineSegments = executedSegments.filter(
         (segment) => segment.lineId === line.id,
@@ -179,6 +191,7 @@ function ExecutionMap({
       });
     }
 
+    // Reveals hidden pixels along the newest executed segment from start to end.
     function animate(startTime) {
       frame.startTime ??= startTime;
 

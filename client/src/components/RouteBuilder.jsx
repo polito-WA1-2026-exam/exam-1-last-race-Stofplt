@@ -1,3 +1,4 @@
+// Renders the ordered route and exposes clear/remove/submit actions.
 function RouteBuilder({
   onClear,
   onRemoveSegment,
@@ -6,6 +7,7 @@ function RouteBuilder({
   submitting = false,
   stations = []
 }) {
+  // Resolves station names locally so the server receives only segment ids.
   const stationById = new Map(stations.map((station) => [station.id, station]));
 
   return (

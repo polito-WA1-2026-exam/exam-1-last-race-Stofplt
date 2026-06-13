@@ -8,20 +8,32 @@ import {
 } from "../api/api.js";
 import ExecutionMap from "../components/ExecutionMap.jsx";
 
+// Replays the submitted route one persisted game_step at a time.
 function ExecutionPage() {
   const { gameId } = useParams();
   const navigate = useNavigate();
+  // Execution network frames the map while executedPaths reveal the actual route.
   const [network, setNetwork] = useState(null);
+  // Prevents the Next button from firing while a step request is in flight.
   const [executing, setExecuting] = useState(false);
+  // Marks that the server has completed the final route step.
   const [completed, setCompleted] = useState(false);
+  // Final score is returned only when the last pending step is executed.
   const [score, setScore] = useState(null);
+  // Current coins are derived server-side from events already applied.
   const [coins, setCoins] = useState(20);
+  // Last event drives the visible execution message.
   const [lastEvent, setLastEvent] = useState(null);
+  // Each executed path is revealed on the map in route order.
   const [executedPaths, setExecutedPaths] = useState([]);
+  // Only the latest segment id animates; older paths stay visible.
   const [animatedSegmentId, setAnimatedSegmentId] = useState(null);
+  // Guards against asking the server for a step after completion.
   const [allStepsDone, setAllStepsDone] = useState(false);
+  // Ref guard blocks rapid double-clicks before React disables the button.
   const executingRef = useRef(false);
 
+  // Rebuilds execution state after refresh by combining network metadata and stored steps.
   useEffect(() => {
     let active = true;
 
@@ -55,6 +67,7 @@ function ExecutionPage() {
     };
   }, [gameId, navigate]);
 
+  // Requests the exact next step index so the server can reject duplicate Next calls.
   async function handleExecute() {
     if (executingRef.current || allStepsDone) {
       return;

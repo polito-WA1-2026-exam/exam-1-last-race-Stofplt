@@ -2,10 +2,12 @@ import { Navigate, useLocation, useNavigate } from "react-router";
 import LoginForm from "../components/LoginForm.jsx";
 import { useUser } from "../contexts/UserContext.js";
 
+// Standalone login route, preserving the protected page that requested auth.
 function LoginPage() {
   const { loggedIn } = useUser();
   const location = useLocation();
   const navigate = useNavigate();
+  // ProtectedRoute stores the attempted destination in location state.
   const from = location.state?.from;
   const destination = from
     ? `${from.pathname}${from.search ?? ""}${from.hash ?? ""}`

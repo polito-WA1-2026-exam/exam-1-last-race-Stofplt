@@ -1,12 +1,10 @@
 const PLANNING_TIME_LIMIT_MS = 90_000;
 
-// ┌─────────────────────────────────────────────────────────┐
-// │ DEBUG: metti a true per avere sempre la stessa tratta. │
-// └─────────────────────────────────────────────────────────┘
 const DEBUG_FIXED_ROUTE = false;
-const FIXED_START_ID = 1; // Shady Grove
-const FIXED_DEST_ID = 10; // Waterfront
+const FIXED_START_ID = 1;
+const FIXED_DEST_ID = 10;
 
+// Builds a directed adjacency list because route distance depends on segment direction.
 function buildAdjacency(segments) {
   const adjacency = new Map();
 
@@ -19,12 +17,12 @@ function buildAdjacency(segments) {
   return adjacency;
 }
 
+// Computes the fewest directed segments from a station with a plain BFS.
 function computeDistances(startStationId, segments) {
   const adjacency = buildAdjacency(segments);
   const distances = new Map([[startStationId, 0]]);
   const queue = [startStationId];
 
-  // BFS is enough here because every segment counts as one stop.
   for (let i = 0; i < queue.length; i++) {
     const current = queue[i];
     const currentDistance = distances.get(current);
@@ -40,10 +38,12 @@ function computeDistances(startStationId, segments) {
   return distances;
 }
 
+// Picks a uniformly random item from a non-empty candidate list.
 function pickRandom(items) {
   return items[Math.floor(Math.random() * items.length)];
 }
 
+// Selects a reachable start/destination pair at least minDistance segments apart.
 function pickStartAndDestination(stations, segments, minDistance = 3) {
   if (DEBUG_FIXED_ROUTE) {
     const start = stations.find((s) => s.id === FIXED_START_ID);
@@ -76,6 +76,7 @@ function pickStartAndDestination(stations, segments, minDistance = 3) {
   return pickRandom(validPairs);
 }
 
+// Sends only the game id and assigned stations needed by the client.
 function buildGameStartPayload(gameId, pair) {
   return {
     gameId,
@@ -90,6 +91,7 @@ function buildGameStartPayload(gameId, pair) {
   };
 }
 
+// Validates the planned route against the server-side game assignment.
 function validateRoute(game, selectedSegments, interchangeStationIds) {
   if (selectedSegments.length === 0) {
     return { valid: false, reason: "The route is empty" };
@@ -99,6 +101,11 @@ function validateRoute(game, selectedSegments, interchangeStationIds) {
     return { valid: false, reason: "The route contains an unknown segment" };
   }
 
+  /*
+   * Segment ids are directed, but the rule bans reusing the same physical
+   * connection in either direction. Sorting the station ids gives A-B and B-A
+   * the same key while preserving the directed ids for continuity checks below.
+   */
   const usedPhysicalSegments = new Set();
 
   for (const segment of selectedSegments) {
@@ -131,8 +138,11 @@ function validateRoute(game, selectedSegments, interchangeStationIds) {
       };
     }
 
-    // With the current segment model this is mostly guaranteed by consecutive
-    // segments, but keeping the check makes the interchange rule explicit.
+    /*
+     * Consecutive segments prove the train reaches the next station; this
+     * separate line-id check enforces that changing line is legal only at an
+     * interchange station.
+     */
     if (
       current.lineId !== next.lineId &&
       !interchangeStationIds.has(current.toStationId)
@@ -157,10 +167,12 @@ function validateRoute(game, selectedSegments, interchangeStationIds) {
   return { valid: true };
 }
 
+// Treats missing session timing as expired, so refresh gaps cannot extend planning.
 function hasPlanningTimeExpired(startedAt, now = Date.now()) {
   return !startedAt || now - startedAt > PLANNING_TIME_LIMIT_MS;
 }
 
+// Replays executed events from the initial 20 coins to build the result payload.
 function buildResultPayload(game, steps) {
   let coins = 20;
 

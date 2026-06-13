@@ -1,6 +1,7 @@
 import LocalStrategy from "passport-local";
 import { getUser, getUserById } from "./dao.js";
 
+// Registers Passport's local strategy and session serialization hooks.
 function configurePassport(passport) {
   passport.use(
     new LocalStrategy(async (username, password, done) => {
@@ -34,6 +35,7 @@ function configurePassport(passport) {
   });
 }
 
+// Guards APIs that require a logged-in player session.
 function isLoggedIn(req, res, next) {
   if (req.isAuthenticated()) {
     return next();

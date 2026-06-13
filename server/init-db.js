@@ -10,12 +10,14 @@ const dbPath = path.join(__dirname, "db.sqlite");
 const sqlPath = path.join(__dirname, "init.sql");
 const sql = fs.readFileSync(sqlPath, "utf8");
 
+// Rebuilds the bundled SQLite database from the authoritative seed script.
 if (fs.existsSync(dbPath)) {
   fs.unlinkSync(dbPath);
 }
 
 const db = new sqlite3.Database(dbPath);
 
+// Executes schema creation and seed inserts as one SQL script.
 db.exec(sql, (err) => {
   if (err) {
     console.error("Cannot initialize database:", err.message);

@@ -7,9 +7,12 @@ import {
 
 const HIGHLIGHT_SIZE = 14;
 
+// Station-only planning map hides lines so the player reconstructs the route mentally.
 function PlanningMap({ destinationStationId, startStationId, stations = [] }) {
+  // Alternates labels by row to reduce collisions in dense station clusters.
   const labelOffsetByStation = getLabelOffsetByStation(stations);
 
+  // Applies semantic styling to start and destination markers.
   function getStationClass(stationId) {
     if (stationId === startStationId) {
       return "planning-map-station is-start";
@@ -21,6 +24,7 @@ function PlanningMap({ destinationStationId, startStationId, stations = [] }) {
     return "planning-map-station";
   }
 
+  // Enlarges assigned stations while leaving ordinary stations compact.
   function getStationSize(stationId) {
     return stationId === startStationId || stationId === destinationStationId
       ? HIGHLIGHT_SIZE

@@ -3,11 +3,14 @@ import { Link, useNavigate } from "react-router";
 import { useUser } from "../contexts/UserContext.js";
 import LoginDialog from "./LoginDialog.jsx";
 
+// Shared header that exposes auth state and protected navigation entry points.
 function AppNavbar() {
   const { loggedIn, logout, user } = useUser();
   const navigate = useNavigate();
+  // Keeps dialog login local to the navbar without changing the current route.
   const [loginOpen, setLoginOpen] = useState(false);
 
+  // Logout always returns to the public instructions page.
   async function handleLogout() {
     await logout();
     navigate("/");

@@ -2,6 +2,7 @@ import { Navigate, useLocation } from "react-router";
 import { Spinner } from "react-bootstrap";
 import { useUser } from "../contexts/UserContext.js";
 
+// Blocks protected pages until the session check proves the user is logged in.
 function ProtectedRoute({ children }) {
   const { loggedIn, loading } = useUser();
   const location = useLocation();

@@ -1,5 +1,6 @@
 import LoginForm from "./LoginForm.jsx";
 
+// Lightweight modal wrapper around the shared login form.
 function LoginDialog({ onClose, onSuccess, open }) {
   if (!open) {
     return null;

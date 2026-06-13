@@ -34,6 +34,7 @@ const port = process.env.PORT || 3001;
 
 configurePassport(passport);
 
+// Common middleware keeps JSON APIs, cross-origin cookies, and Passport sessions aligned.
 app.use(express.json());
 app.use(
   cors({
@@ -50,10 +51,12 @@ app.use(
 );
 app.use(passport.authenticate("session"));
 
+// Health check used for quick manual API verification.
 app.get("/api/health", (req, res) => {
   res.json({ ok: true, service: "last-race-api" });
 });
 
+// Public rules payload mirrors the instructions page without exposing the network.
 app.get("/api/instructions", (req, res) => {
   res.json({
     title: "Last Race",
@@ -67,6 +70,7 @@ app.get("/api/instructions", (req, res) => {
   });
 });
 
+// Creates a session by delegating salted password verification to Passport.
 app.post("/api/sessions", (req, res, next) => {
   passport.authenticate("local", (err, user, info) => {
     if (err) {
@@ -85,10 +89,12 @@ app.post("/api/sessions", (req, res, next) => {
   })(req, res, next);
 });
 
+// Returns the user currently stored in the session cookie.
 app.get("/api/sessions/current", isLoggedIn, (req, res) => {
   res.json(req.user);
 });
 
+// Destroys the Passport login state for the current session.
 app.delete("/api/sessions/current", isLoggedIn, (req, res, next) => {
   req.logout((err) => {
     if (err) {
@@ -98,6 +104,7 @@ app.delete("/api/sessions/current", isLoggedIn, (req, res, next) => {
   });
 });
 
+// Setup intentionally receives the full network and unlocks game creation.
 app.get("/api/network/full", isLoggedIn, async (req, res, next) => {
   try {
     const [stations, lines, segments] = await Promise.all([
@@ -113,6 +120,7 @@ app.get("/api/network/full", isLoggedIn, async (req, res, next) => {
   }
 });
 
+// Planning map needs station coordinates but not line or path data.
 app.get("/api/network/stations", isLoggedIn, async (req, res, next) => {
   try {
     const stations = await getStations();
@@ -123,6 +131,7 @@ app.get("/api/network/stations", isLoggedIn, async (req, res, next) => {
   }
 });
 
+// Planning receives station pairs and both directions, but no line names or SVG paths.
 app.get("/api/network/planning", isLoggedIn, async (req, res, next) => {
   try {
     const [stations, segmentPairs] = await Promise.all([
@@ -136,6 +145,7 @@ app.get("/api/network/planning", isLoggedIn, async (req, res, next) => {
   }
 });
 
+// Execution receives enough network shape to frame the map without revealing future paths.
 app.get("/api/network/execution", isLoggedIn, async (req, res, next) => {
   try {
     const [stations, lines, segments] = await Promise.all([
@@ -159,6 +169,7 @@ app.get("/api/network/execution", isLoggedIn, async (req, res, next) => {
   }
 });
 
+// Starts a game only after the player has loaded the setup network in this session.
 app.post("/api/games", isLoggedIn, async (req, res, next) => {
   try {
     if (!req.session.networkLoaded) {
@@ -187,6 +198,7 @@ app.post("/api/games", isLoggedIn, async (req, res, next) => {
   }
 });
 
+// Returns assignment and remaining planning time for refresh-safe planning pages.
 app.get("/api/games/:id/planning", isLoggedIn, async (req, res, next) => {
   try {
     const gameId = Number(req.params.id);
@@ -229,6 +241,11 @@ app.get("/api/games/:id/planning", isLoggedIn, async (req, res, next) => {
   }
 });
 
+/*
+ * Validates and accepts the submitted route before execution starts. Expired or
+ * invalid plans are failed immediately, while valid plans are persisted as
+ * ordered game_steps rows by the DAO.
+ */
 app.post("/api/games/:id/route", isLoggedIn, async (req, res, next) => {
   try {
     const gameId = Number(req.params.id);
@@ -306,6 +323,7 @@ app.post("/api/games/:id/route", isLoggedIn, async (req, res, next) => {
   }
 });
 
+// Executes one expected route step and returns only the new event/path payload.
 app.post("/api/games/:id/execute/next", isLoggedIn, async (req, res, next) => {
   try {
     const gameId = Number(req.params.id);
@@ -357,6 +375,7 @@ app.post("/api/games/:id/execute/next", isLoggedIn, async (req, res, next) => {
   }
 });
 
+// Rebuilds the execution page from persisted steps after refresh or navigation.
 app.get("/api/games/:id/execution", isLoggedIn, async (req, res, next) => {
   try {
     const gameId = Number(req.params.id);
@@ -402,6 +421,7 @@ app.get("/api/games/:id/execution", isLoggedIn, async (req, res, next) => {
   }
 });
 
+// Returns final game data for both completed and failed games owned by the user.
 app.get("/api/games/:id/result", isLoggedIn, async (req, res, next) => {
   try {
     const gameId = Number(req.params.id);
@@ -423,6 +443,7 @@ app.get("/api/games/:id/result", isLoggedIn, async (req, res, next) => {
   }
 });
 
+// Exposes each player's best completed score.
 app.get("/api/ranking", isLoggedIn, async (req, res, next) => {
   try {
     const ranking = await getRanking();
@@ -438,15 +459,18 @@ app.get("/api/ranking", isLoggedIn, async (req, res, next) => {
   }
 });
 
+// Keeps missing API paths JSON-shaped for the client.
 app.use((req, res, next) => {
   res.status(404).json({ error: "API route not found" });
 });
 
+// Centralizes unexpected failures without leaking internals to the client.
 app.use((err, req, res, next) => {
   console.error(err);
   return res.status(500).json({ error: "Internal server error" });
 });
 
+// Starts the API server used by the Vite client in the two-server setup.
 app.listen(port, () => {
   console.log(`Last Race API listening at http://localhost:${port}`);
 });

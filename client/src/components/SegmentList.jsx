@@ -1,5 +1,6 @@
 import { useState } from "react";
 
+// CSS-drawn icon keeps the direction switch consistent with the pixel UI.
 function PixelSwapIcon() {
   return (
     <span className="pixel-swap-icon" aria-hidden="true">
@@ -9,6 +10,7 @@ function PixelSwapIcon() {
   );
 }
 
+// Lists physical station pairs while letting the player choose one direction.
 function SegmentList({
   onSwitchSelected,
   onToggle,
@@ -17,9 +19,12 @@ function SegmentList({
   segmentPairs = [],
   stations = []
 }) {
+  // Station lookup keeps labels readable without changing the selected payload.
   const stationById = new Map(stations.map((station) => [station.id, station]));
+  // Tracks unselected pairs currently shown in reverse direction.
   const [reversedPairIds, setReversedPairIds] = useState(new Set());
 
+  // Returns the direction currently represented by a physical pair button.
   function getDirection(pair) {
     const forward =
       pair.directions.find(
@@ -37,6 +42,7 @@ function SegmentList({
     return reversedPairIds.has(pair.id) ? reverse : forward;
   }
 
+  // Switches either local display direction or the already selected route step.
   function switchDirection(pair, selectedSegmentId) {
     if (selectedSegmentId) {
       onSwitchSelected(selectedSegmentId);

@@ -4,12 +4,17 @@ import { useNavigate } from "react-router";
 import { createGame, getNetwork } from "../api/api.js";
 import NetworkMap from "../components/NetworkMap.jsx";
 
+// Shows the complete network before creating a server-assigned game.
 function SetupPage() {
   const navigate = useNavigate();
+  // Full setup network includes stations, lines, and segment SVG paths.
   const [network, setNetwork] = useState(null);
+  // Surface API errors without leaving the protected setup route.
   const [error, setError] = useState("");
+  // Disables Start while game creation is in flight.
   const [starting, setStarting] = useState(false);
 
+  // Loading the network also marks the session ready for game creation.
   useEffect(() => {
     let active = true;
 
@@ -30,6 +35,7 @@ function SetupPage() {
     };
   }, []);
 
+  // Creates a game and passes the initial assignment to Planning for fast render.
   async function handleStartGame() {
     setError("");
     setStarting(true);

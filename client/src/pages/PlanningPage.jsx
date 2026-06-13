@@ -13,24 +13,34 @@ import SegmentList from "../components/SegmentList.jsx";
 
 const PLANNING_SECONDS = 90;
 
+// Coordinates the timed route-building phase and submits the selected segment ids.
 function PlanningPage() {
   const { gameId } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
+  // Initial navigation state avoids a blank page while the server payload reloads.
   const [game, setGame] = useState(location.state ?? null);
+  // Planning map uses station positions only, separate from selectable segment pairs.
   const [mapStations, setMapStations] = useState([]);
+  // Reduced planning network: station names plus bidirectional segment pairs.
   const [network, setNetwork] = useState(null);
+  // Ordered directed segment ids chosen by the player.
   const [selectedSegmentIds, setSelectedSegmentIds] = useState([]);
+  // Disables submit controls while the server validates the route.
   const [submitting, setSubmitting] = useState(false);
+  // Client-side countdown mirrors the authoritative remaining seconds from the server.
   const [timeLeft, setTimeLeft] = useState(PLANNING_SECONDS);
+  // Refs keep timeout and submit callbacks reading fresh state instead of stale closures.
   const selectedSegmentIdsRef = useRef([]);
   const submittingRef = useRef(false);
   const autoSubmittedRef = useRef(false);
 
+  // Keeps the timeout callback aligned with the latest selected route.
   useEffect(() => {
     selectedSegmentIdsRef.current = selectedSegmentIds;
   }, [selectedSegmentIds]);
 
+  // Maps each directed segment id to its data for fast selected-route rendering.
   const segmentById = useMemo(() => {
     if (!network) {
       return new Map();
@@ -43,12 +53,14 @@ function PlanningPage() {
     );
   }, [network]);
 
+  // Expands selected ids into ordered segment objects shown in the route panel.
   const selectedSegments = useMemo(() => {
     return selectedSegmentIds
       .map((segmentId) => segmentById.get(segmentId))
       .filter(Boolean);
   }, [segmentById, selectedSegmentIds]);
 
+  // Links each directed segment back to its physical planning pair.
   const segmentIdToPairId = useMemo(() => {
     if (!network) {
       return new Map();
@@ -64,6 +76,8 @@ function PlanningPage() {
 
     return pairs;
   }, [network]);
+
+  // Provides pair metadata when switching an already selected direction.
   const pairById = useMemo(() => {
     if (!network) {
       return new Map();
@@ -72,6 +86,7 @@ function PlanningPage() {
     return new Map(network.segmentPairs.map((pair) => [pair.id, pair]));
   }, [network]);
 
+  // Tracks selected physical pairs so the list can prevent duplicate pair usage.
   const selectedPairIds = useMemo(
     () =>
       new Set(
@@ -81,6 +96,8 @@ function PlanningPage() {
       ),
     [segmentIdToPairId, selectedSegmentIds],
   );
+
+  // Stores the selected direction for each physical pair.
   const selectedSegmentIdByPairId = useMemo(() => {
     const selectedPairs = new Map();
 
@@ -94,6 +111,8 @@ function PlanningPage() {
 
     return selectedPairs;
   }, [segmentIdToPairId, selectedSegmentIds]);
+
+  // Converts remaining seconds into NES progress state.
   const timePercentage = Math.ceil((timeLeft / PLANNING_SECONDS) * 100);
   const timerClass =
     timePercentage <= 20
@@ -102,6 +121,7 @@ function PlanningPage() {
         ? "is-warning"
         : "is-success";
 
+  // Loads all planning data together so the page switches from loader to ready once.
   useEffect(() => {
     let active = true;
 
@@ -129,6 +149,7 @@ function PlanningPage() {
     };
   }, [gameId, navigate]);
 
+  // Submits once; invalid routes go directly to result, valid routes enter execution.
   const submitSelectedRoute = useCallback(
     async (segmentIds = selectedSegmentIdsRef.current) => {
       if (submittingRef.current) {
@@ -157,6 +178,11 @@ function PlanningPage() {
     [gameId, navigate],
   );
 
+  /*
+   * Starts the local countdown from the server-provided remaining time. The
+   * timeout submits the latest ref-held route so an expired timer cannot submit
+   * an older selection captured when the effect was created.
+   */
   useEffect(() => {
     if (!network || !game) {
       return undefined;
@@ -184,6 +210,7 @@ function PlanningPage() {
     };
   }, [game, network, submitSelectedRoute]);
 
+  // Toggles a physical pair by adding its current direction or removing the pair.
   function toggleSegment(pairId, segmentId) {
     setSelectedSegmentIds((current) => {
       if (current.some((id) => segmentIdToPairId.get(id) === pairId)) {
@@ -194,6 +221,7 @@ function PlanningPage() {
     });
   }
 
+  // Replaces the selected direction while preserving the pair's route position.
   function switchSelectedDirection(segmentId) {
     const pairId = segmentIdToPairId.get(segmentId);
     const pair = pairById.get(pairId);
@@ -215,12 +243,14 @@ function PlanningPage() {
     );
   }
 
+  // Removes a single directed segment from the planned order.
   function removeSelectedSegment(segmentId) {
     setSelectedSegmentIds((current) =>
       current.filter((id) => id !== segmentId),
     );
   }
 
+  // Clears all planned segments without touching timer or assignment state.
   function clearRoute() {
     setSelectedSegmentIds([]);
   }

@@ -1,3 +1,4 @@
+// Station coordinates are stored server-side and reused by every SVG map.
 class Station {
   constructor(id, name, x, y) {
     this.id = id;
@@ -7,6 +8,7 @@ class Station {
   }
 }
 
+// A metro line carries the display color used by setup and execution maps.
 class Line {
   constructor(id, name, color) {
     this.id = id;
@@ -15,6 +17,7 @@ class Line {
   }
 }
 
+// Segments are directed edges; opposite travel directions have separate ids.
 class Segment {
   constructor(id, fromStationId, toStationId, lineId, path) {
     this.id = id;

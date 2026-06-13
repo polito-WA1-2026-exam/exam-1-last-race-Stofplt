@@ -11,6 +11,7 @@ import RankingPage from "./pages/RankingPage.jsx";
 import ResultPage from "./pages/ResultPage.jsx";
 import SetupPage from "./pages/SetupPage.jsx";
 
+// Defines the SPA route table and wraps protected routes in session guards.
 function App() {
   return (
     <BrowserRouter>

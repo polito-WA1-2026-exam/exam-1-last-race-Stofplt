@@ -3,10 +3,13 @@ import { Spinner } from "react-bootstrap";
 import { useNavigate } from "react-router";
 import { getRanking } from "../api/api.js";
 
+// Shows the best completed score for each registered player.
 function RankingPage() {
   const navigate = useNavigate();
+  // Null means loading; an empty array means no completed games.
   const [ranking, setRanking] = useState(null);
 
+  // Ranking is protected, so request failures fall back to the public page.
   useEffect(() => {
     let active = true;
 
